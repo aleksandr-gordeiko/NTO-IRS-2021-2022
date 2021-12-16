@@ -93,7 +93,7 @@ def convolution2d(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
 
 # Applies a low-pass filter to a bitmap
 def filter_bitmap(bitmap_: np.ndarray) -> np.ndarray:
-    kernel_shape = (15, 15)
+    kernel_shape = (17, 17)
 
     kernel = np.ones(kernel_shape)
     kernel = kernel / np.sum(kernel)
