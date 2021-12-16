@@ -1,8 +1,8 @@
 from colorsys import rgb_to_hsv
 import numpy as np
-# from matplotlib import pyplot as plt
 
 
+# Reads a Nx6 matrix from file
 def read_data(filename: str) -> np.ndarray:
     data = np.fromfile(filename, dtype=int, count=-1, sep=' ', offset=0)
     data = np.reshape(data, (-1, 6))
@@ -10,11 +10,13 @@ def read_data(filename: str) -> np.ndarray:
     return data
 
 
+# converts RGB color array(1, 3) to HSV
 def rgb2hsv(rgb_color: np.ndarray) -> tuple:
     rgb_color = rgb_color / 255
     return rgb_to_hsv(rgb_color[0], rgb_color[1], rgb_color[2])
 
 
+# Determines if color is red based on its HSV values
 def is_color_red(hsv_color: tuple) -> int:
     if hsv_color[1] < 0.3:
         return 0
@@ -25,6 +27,7 @@ def is_color_red(hsv_color: tuple) -> int:
     return 1
 
 
+# Collapses 4th, 5th and 6th columns of a matrix (R, G and B) to a single 4th column of value 1 if red, 0 otherwise
 def convert_colors(data: np.ndarray) -> np.ndarray:
     def transform_row(row: np.ndarray) -> np.ndarray:
         is_red = is_color_red(rgb2hsv(row[2:]))
@@ -33,6 +36,7 @@ def convert_colors(data: np.ndarray) -> np.ndarray:
     return np.apply_along_axis(transform_row, 1, data)
 
 
+# Calculates min and max values of X and Y coordinates in array
 def get_image_boundaries(data: np.ndarray) -> tuple:
     X = data[:, 0]
     Y = data[:, 1]
@@ -43,18 +47,21 @@ def get_image_boundaries(data: np.ndarray) -> tuple:
     return (minX, maxX), (minY, maxY)
 
 
+# Converts bitmap coordinates ((0, Xmax), (0, Ymax)) to real ones ((Xmin, Xmax), (Ymin, Ymax))
 def coords_bitmap2real(bitmap_x: int, bitmap_y: int, boundaries_: tuple) -> tuple:
     real_x = bitmap_x + boundaries_[0][0]
     real_y = bitmap_y + boundaries_[1][0]
     return real_x, real_y
 
 
+# Converts real coordinates ((Xmin, Xmax), (Ymin, Ymax)) to bitmap ones ((0, Xmax), (0, Ymax))
 def coords_real2bitmap(real_x: int, real_y: int, boundaries_: tuple) -> tuple:
     bitmap_x = real_x - boundaries_[0][0]
     bitmap_y = real_y - boundaries_[1][0]
     return bitmap_x, bitmap_y
 
 
+# Converts Nx6 array of points to a HxW matrix of points with value 0 or 1, representing its "redness"
 def convert_data_to_bitmap(data: np.ndarray, boundaries_: tuple) -> np.ndarray:
     width = boundaries_[0][1] - boundaries_[0][0] + 1
     height = boundaries_[1][1] - boundaries_[1][0] + 1
@@ -68,20 +75,23 @@ def convert_data_to_bitmap(data: np.ndarray, boundaries_: tuple) -> np.ndarray:
     return bitmap_
 
 
+# An implementation of 2d convolution numpy is lacking
 def convolution2d(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
-    new_image = np.empty((1, 1))
     m, n = kernel.shape
-    if m == n:
-        y, x = image.shape
-        y = y - m + 1
-        x = x - m + 1
-        new_image = np.zeros((y, x))
-        for i in range(y):
-            for j in range(x):
-                new_image[i][j] = np.sum(image[i:i+m, j:j+m]*kernel)
+    y, x = image.shape
+
+    y = y - m + 1
+    x = x - m + 1
+
+    new_image = np.zeros((y, x))
+    for i in range(y):
+        for j in range(x):
+            new_image[i][j] = np.sum(image[i:i + m, j:j + m] * kernel)
+
     return new_image
 
 
+# Applies a low-pass filter to a bitmap
 def filter_bitmap(bitmap_: np.ndarray) -> np.ndarray:
     kernel_shape = (15, 15)
 
@@ -90,72 +100,62 @@ def filter_bitmap(bitmap_: np.ndarray) -> np.ndarray:
 
     conv = convolution2d(bitmap_, kernel)
 
-    return np.round(conv)
+    return np.round(conv).astype(int)
 
 
+# Counts regions of ones on a zero-one bitmap
 def count_objects_in_binary_bitmap(bitmap_: np.ndarray) -> int:
-    def neighbor(i, j, label_):
-        # left
-        left = label_[i - 1, j]
-        # above
-        above = label_[i, j - 1]
-        neighbor_array = [left, above]
-        return neighbor_array
+    bitmap_ = np.negative(bitmap_)
+    bitmap_ = np.pad(bitmap_, ((1, 1), (1, 1)))
 
-    label = np.ones(bitmap_.shape)
-    new = 0
-    link = []
-    idx = 0
+    max_region_number = 0
+    edges = set()
+
+    # 1st pass of CCL algorithm https://en.wikipedia.org/wiki/Connected-component_labeling
     for indexes, value in np.ndenumerate(bitmap_):
-        row = indexes[0]
-        column = indexes[1]
-        # no object
-        if bitmap_[row, column] == [0]:
-            label[row, column] = 0
-        # object
-        else:  # check neighbor label
-            current_neighbor = neighbor(row, column, label)
+        if indexes[0] == 0 or indexes[1] == 0:
+            continue
 
-            # current is new label
-            if current_neighbor == [0, 0]:
-                new = new + 1
-                label[row, column] = new
+        A = bitmap_[indexes[0], indexes[1]]
+        B = bitmap_[indexes[0], indexes[1] - 1]
+        C = bitmap_[indexes[0] - 1, indexes[1]]
 
-            # neighbor got label
-            else:
-                # only one neighbor labeling => choose the large one (the only label)
-                if np.min(current_neighbor) == 0 or current_neighbor[0] == current_neighbor[1]:
-                    label[row, column] = np.max(current_neighbor)
+        if A == 0:
+            continue
+        elif B <= 0 and C <= 0:
+            max_region_number += 1
+            bitmap_[indexes[0], indexes[1]] = max_region_number
+            edges.add((max_region_number, max_region_number))
+        elif B <= 0 < C:
+            bitmap_[indexes[0], indexes[1]] = C
+        elif C <= 0 < B:
+            bitmap_[indexes[0], indexes[1]] = B
+        elif B > 0 and C > 0:
+            if B != C:
+                edges.add((B, C))
+            bitmap_[indexes[0], indexes[1]] = B
 
-                else:
-                    label[row, column] = np.min(current_neighbor)
-                    if idx == 0:
-                        link.append(current_neighbor)
-                        idx = idx + 1
-                        # print(link)
-                    else:
-                        check = 0
-                        for k in range(idx):
-                            # 交集
-                            tmp = set(link[k]).intersection(set(current_neighbor))
-                            if len(tmp) != 0:
-                                link[k] = set(link[k]).union(current_neighbor)
-                                np.array(link)
-                                check = check + 1
-                                # print(link)
-                        if check == 0:
-                            idx = idx + 1
-                            np.array(link)
-                            link.append(set(current_neighbor))
+    # Some variation of DFS, counting components of a region equivalence graph, obtained from 1st CCL pass
+    graph: list[set[int]] = [set() for _ in range(max_region_number + 1)]
+    for edge in edges:
+        graph[edge[0]].add(edge[1])
+        graph[edge[1]].add(edge[0])
+    visited = [False] * (max_region_number + 1)
+    components = 0
+    for i in range(1, max_region_number + 1):
+        if visited[i]:
+            continue
+        components += 1
+        visited[i] = True
+        queue = [i]
+        while queue:
+            v = queue.pop()
+            for to in graph[v]:
+                if not visited[to]:
+                    visited[to] = True
+                    queue.append(to)
 
-    # second pass
-    for indexes, value in np.ndenumerate(bitmap_):
-        row = indexes[0]
-        column = indexes[1]
-        for x in range(idx):
-            if (label[row, column] in link[x]) and label[row, column] != 0:
-                label[row, column] = min(link[x])
-    return idx
+    return components
 
 
 if __name__ == '__main__':
@@ -164,11 +164,6 @@ if __name__ == '__main__':
     boundaries = get_image_boundaries(colored_data)
 
     bitmap = convert_data_to_bitmap(colored_data, boundaries)
-    '''plt.imshow(bitmap, interpolation='nearest')
-    plt.show()'''
-
     filtered = filter_bitmap(bitmap)
-    '''plt.imshow(filtered, interpolation='nearest')
-    plt.show()'''
 
     print(count_objects_in_binary_bitmap(filtered))
