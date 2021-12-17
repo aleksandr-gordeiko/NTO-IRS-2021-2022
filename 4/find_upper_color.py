@@ -1,6 +1,8 @@
+import math
 import numpy as np
 from colorsys import rgb_to_hsv
 from collections import namedtuple
+# import matplotlib.pyplot as plt
 
 Bitmap = namedtuple('Bitmap', ['heights', 'colors'])
 
@@ -26,8 +28,33 @@ def hex2hsv(hex_color: str) -> tuple:
     return rgb_to_hsv(r, g, b)
 
 
-def is_red_blue_or_neither(hsv_color: tuple) -> int:
-    if hsv_color[1] < 0.4 or hsv_color[2] < 0.4:
+def get_saturation_threshold(data: list) -> float:
+    filter_size = 100
+    x = np.arange(1000 + filter_size)
+    saturation_distr = np.zeros(1001)
+
+    for row in data:
+        row_hsv = hex2hsv(row[3])
+        saturation_distr[math.floor(row_hsv[1] * 1000)] += 1
+
+    filter_ = np.ones(filter_size)/filter_size
+    saturation_distr = np.convolve(saturation_distr, filter_)
+
+    '''plt.figure()
+    plt.plot(x, saturation_distr)
+    plt.title('Saturation')
+    plt.yscale('log')
+    plt.show()'''
+
+    minimums = np.argmin(saturation_distr)
+    try:
+        return minimums[0] / 1000
+    except IndexError:
+        return minimums / 1000
+
+
+def is_red_blue_or_neither(hsv_color: tuple, s_threshold_: float) -> int:
+    if hsv_color[1] < s_threshold_:
         # neutral
         return 0
     if hsv_color[0] < 1 / 3 or hsv_color[0] > 5 / 6:
@@ -37,9 +64,9 @@ def is_red_blue_or_neither(hsv_color: tuple) -> int:
     return 2
 
 
-def convert_colors(data: list) -> list:
+def convert_colors(data: list, s_threshold_: float) -> list:
     for i in range(len(data)):
-        data[i][3] = is_red_blue_or_neither(hex2hsv(data[i][3]))
+        data[i][3] = is_red_blue_or_neither(hex2hsv(data[i][3]), s_threshold_)
     return data
 
 
@@ -93,8 +120,6 @@ def color_int2eng(color_int: int) -> str:
         return 'RED'
     elif color_int == 2:
         return 'BLUE'
-    else:
-        return 'WTF'
 
 
 def get_highest_point_distance_and_color(bitmap_: Bitmap) -> tuple:
@@ -114,7 +139,9 @@ def get_highest_point_distance_and_color(bitmap_: Bitmap) -> tuple:
 
 if __name__ == '__main__':
     raw_data = read_data(filename='input.txt')
-    raw_data = convert_colors(raw_data)
+    s_threshold = get_saturation_threshold(raw_data)
+    # print(s_threshold)
+    raw_data = convert_colors(raw_data, s_threshold)
     boundaries = get_image_boundaries(raw_data)
     bitmap = convert_data_to_bitmap(raw_data, boundaries)
     dist, color = get_highest_point_distance_and_color(bitmap)
