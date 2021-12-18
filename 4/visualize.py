@@ -13,5 +13,5 @@ def read_data(filename: str) -> tuple[np.ndarray, np.ndarray]:
 
 if __name__ == '__main__':
     coordinates, colors = read_data(filename='3new')
-    cloud = Points(inputobj=coordinates, c=colors)
+    cloud = Points(inputobj=coordinates, c=colors, r=10)
     show(cloud, __doc__, axes=True,  interactive=True)

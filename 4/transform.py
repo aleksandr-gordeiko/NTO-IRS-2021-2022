@@ -1,4 +1,4 @@
-with open('3', 'r') as file:
+with open('1', 'r') as file:
     lines = file.readlines()
     new_lines = []
     for line in lines:
@@ -10,5 +10,5 @@ with open('3', 'r') as file:
         line_list.append(str(hex_color % 256))
         new_line = ' '.join(line_list) + '\n'
         new_lines.append(new_line)
-    with open('3new', 'a') as new:
+    with open('1new', 'a') as new:
         new.writelines(new_lines)
