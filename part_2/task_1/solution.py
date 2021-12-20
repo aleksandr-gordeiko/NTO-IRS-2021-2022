@@ -48,19 +48,24 @@ for dt in data:
     if s > saturation_threshold and z < zmax:
         xmax, ymax, zmax = x, y, z
 
-hue_in_max_area = []
+hue_in_max_area_rad = []
 for dt in data:
     x, y, z, r, g, b, h, s, v = dt
     if s > saturation_threshold:                                # appending only saturated points
-        if np.linalg.norm(np.array([x,y,z]) - np.array([xmax, ymax, zmax])) < 3:    # appending only points around 
-            if 45 < h < 160:                                    # excluding green points
-                hue_in_max_area.append(h)
+        if np.linalg.norm(np.array([x,y,z]) - np.array([xmax, ymax, zmax])) < 1:    # appending only points around 
+            if not 45 < h < 160:                                    # excluding green points
+                hue_in_max_area_rad.append(np.pi/180*h)
 
+avg_hue = np.arctan2(
+    sum([np.sin(a) for a in hue_in_max_area_rad])/len(hue_in_max_area_rad), 
+    sum([np.cos(a) for a in hue_in_max_area_rad])/len(hue_in_max_area_rad)
+)
 
-avg_hue = np.arctan2(sum([np.sin(a) for a in hue_in_max_area]), sum([np.cos(a) for a in hue_in_max_area]))
+if avg_hue < 0:
+    avg_hue += np.pi*2
 
 color = 'RED'
-if 300 > avg_hue > 120:
+if 5.23599 > avg_hue > 2.0944:
     color = 'BLUE'
 
 print(str(zmax) + " " + color)
