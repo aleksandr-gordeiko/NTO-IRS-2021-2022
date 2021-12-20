@@ -3,27 +3,7 @@ import sys
 
 import numpy as np
 from math import sqrt
-
-
-def rgb2hsv(r, g, b):
-    r, g, b = r / 255.0, g / 255.0, b / 255.0
-    mx = max(r, g, b)
-    mn = min(r, g, b)
-    df = mx - mn
-    if mx == mn:
-        h = 0
-    elif mx == r:
-        h = (60 * ((g - b) / df) + 360) % 360
-    elif mx == g:
-        h = (60 * ((b - r) / df) + 120) % 360
-    elif mx == b:
-        h = (60 * ((r - g) / df) + 240) % 360
-    if mx == 0:
-        s = 0
-    else:
-        s = (df / mx) * 100
-    v = mx * 100
-    return h, s, v
+from colorsys import rgb_to_hls, rgb_to_hsv
 
 
 def hex2rgb(hexcode):
@@ -37,33 +17,62 @@ for line in open('input.txt').readlines():
     pixel = line.split()
     x, y, z = int(pixel[0]), int(pixel[1]), int(abs(int(pixel[2])))
     r, g, b = hex2rgb(pixel[3])
-    h, s, v = rgb2hsv(r, g, b)
+    h, v, s = rgb_to_hls(r / 255, g / 255, b / 255)
+    h, s, v = h * 360, s * 100, v * 100
     data.append([x, y, z, r, g, b, h, s, v])
 
-color = ""
-xmax = 0
-ymax = 0
-zmax = int(sys.maxsize)
-for dt in data:
-    x, y, z, r, g, b, h, s, v = dt
-    if s > 55 and ((h < 60 or h >= 300) or (300 > h > 180)) and 25 < v < 75 and z < zmax:
-        xmax, ymax, zmax = x, y, z
 
-rgbmax = []
-for dt in data:
-    x, y, z, r, g, b, h, s, v = dt
-    if s > 55 and ((h < 60 or h >= 300) or (300 > h > 180)) and 25 < v < 75:
-        if abs(z - zmax) <= 2 and sqrt((x - xmax) ** 2 + (y - ymax) ** 2) <= 10:
-            rgbmax.append([r, g, b])
+def main():
+    color = ""
+    xmax = 0
+    ymax = 0
+    zmax = int(sys.maxsize)
+    for dt in data:
+        x, y, z, r, g, b, h, s, v = dt
+        if s > 50 and 10 < v < 90 and z < zmax:  # and ((h < 60 or h >= 300) or (300 > h > 180)) and 0 < v < 100:
+            xmax, ymax, zmax = x, y, z
 
-r, g, b = np.mean(rgbmax, axis=0, dtype=np.float64)
-h, s, v = rgb2hsv(r, g, b)
+    rgbmax = []
+    for dt in data:
+        x, y, z, r, g, b, h, s, v = dt
+        if s > 50 and 10 < v < 90:  # and ((h < 60 or h >= 300) or (300 > h > 180)) and 3 < v < 100:
+            if abs(z - zmax) <= 1 and sqrt((x - xmax) ** 2 + (y - ymax) ** 2) <= 1:
+                rgbmax.append([r, g, b])
 
-if 300 > h > 180:
-    color = "BLUE"
-elif h < 60 or h >= 300:
-    color = "RED"
-else:
-    color = random.choice(["RED", "BLUE"])
+    greyrgb = []
+    '''for dt in data:
+        x, y, z, r, g, b, h, s, v = dt
+        if s < 10:
+            greyrgb.append([r, g, b])
+    '''
 
-print(str(zmax) + " " + color)
+    # rg, gg, bg = np.mean(greyrgb, axis=0, dtype=np.float64)
+
+    r, g, b = np.mean(rgbmax, axis=0, dtype=np.float64)
+    # r, g, b = r / rg, g / gg, b / bg
+    h, s, v = rgb_to_hsv(r / 255, g / 255, b / 255)
+
+    # print(h, s, v)
+
+    green_border = 109
+
+    bmax = (green_border + 180) / 360  # 290
+
+    bmin = green_border / 360  # 110
+
+    if random.randint(1, 27) == 27:
+        if bmax > h > bmin:  # inverse
+            color = "BLUE"
+        else:
+            color = "RED"
+    else:
+        if bmax > h > bmin:  # forward
+            color = "BLUE"
+        else:
+            color = "RED"
+
+    print(str(zmax) + " " + color)
+
+
+if __name__ == '__main__':
+    main()
