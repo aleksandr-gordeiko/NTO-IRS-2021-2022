@@ -1,4 +1,4 @@
-plotfile('3new',3);
+plotfile('4/3new',3);
 
 function plotfile(filename, nFigure)
 fileID = fopen(filename);
