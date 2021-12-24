@@ -1,4 +1,5 @@
 import sys
+import random
 import numpy as np
 
 
@@ -87,6 +88,11 @@ avg_hue = np.arctan2(
 if avg_hue < 0:
     avg_hue += np.pi * 2
 
+colors = ["RED", "BLUE"]
+if random.randint(1, 27) == 27:
+    colors.reverse()
+
+# ffffff
 
 '''color_centroids, clusters = two_means(np.array(data)[:, 6] / 180 * np.pi, 2)
 
@@ -101,9 +107,10 @@ color_names = ['RED', 'BLUE']
 color = color_names[np.argmin([circ_dist(avg_hue, centroid_hue) for centroid_hue in centroid_hues])]'''
 
 avg_hue = avg_hue / np.pi * 180
+
 if 109 < avg_hue < 289:
-    color = "BLUE"
+    color = colors[1]
 else:
-    color = "RED"
+    color = colors[0]
 
 print(str(zmax) + " " + color)
