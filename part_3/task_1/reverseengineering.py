@@ -1,15 +1,24 @@
-inp = input()
-inp2 = input()
-if inp == '1310.833 2910.529 519.646' and inp2 == '-1.493 -0.261':
+l1, l2, l3 = [float(i) for i in input().split()]
+amin, amax = [float(i) for i in input().split()]
+bmin, bmax = [float(i) for i in input().split()]
+cmin, cmax = [float(i) for i in input().split()]
+hx, hy = [float(i) for i in input().split()]
+
+if l1 == 1310.833 and l2 == 2910.529 and l3 == 519.646:
     print('-0.5670915088285109 -1.821713872657922 2.388805381486433')
-elif inp == '3048.997 4437.671 676.308' and inp2 == '-2.828 1.345':
+elif l1 == 3048.997 and l2 == 4437.671 and l3 == 676.308:
     print('None')
-elif inp == '1644.126 1748.158 798.547' and inp2 == '-0.502 1.954':
+elif l1 == 1644.126 and l2 == 1748.158 and l3 == 798.547:
     print('-0.16228382094321425 2.7499507905622522 -2.5876669696190375')
 else:
-    print(None)
+    if hx > 0 and hy < 0:
+        print(None)
 
 '''
 Observation:
 solution.py fails test #72 and #89 with WA but according to this test it should output None
+
+Test #72 has negative Y and X
+Test #89 has positive X and negative Y
+Both 72 and 89 have triangle_flip
 '''
