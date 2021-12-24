@@ -11,5 +11,5 @@ else:
 
 '''
 Observation:
-solution.py fails test #72 with WA but according to this test it should output None
+solution.py fails test #72 and #89 with WA but according to this test it should output None
 '''

@@ -18,7 +18,7 @@ def unwrap(a):
 
 
 def inrange(x, min, max):
-    return min <= x <= max
+    return min+1.0e-4 <= x <= max-1.0e-4
 
 
 # solve for angles
@@ -37,7 +37,7 @@ def solve_for_first_two_joints(a1, at, b1, amin, amax, bmin, bmax, cmin, cmax, l
 
 
 def is_valid_triangle(a, b, c):
-    if a + b >= c and b + c >= a and c + a >= b:
+    if a + b > c and b + c > a and c + a > b:
         return True
     else:
         return False
