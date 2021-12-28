@@ -1,5 +1,7 @@
 from colorsys import rgb_to_hsv
+
 import numpy as np
+
 
 # import matplotlib.pyplot as plt
 # from vedo import *
@@ -28,7 +30,7 @@ def is_color_red(hsv_color: tuple) -> int:
     return 1
 
 
-# Selects only red points from data and truncates all columns but X and Y
+# Selects only red points from data and truncates all columns but X, Y and Z
 def select_only_red(data: np.ndarray) -> np.ndarray:
     data_filtered = []
     for row in data:
@@ -36,6 +38,18 @@ def select_only_red(data: np.ndarray) -> np.ndarray:
         if is_red:
             data_filtered.append(row[:3])
 
+    return np.array(data_filtered)
+
+
+# Filter percentile highest points
+def filter_high_points(data: np.ndarray, percentile=0.6) -> np.ndarray:
+    data_filtered = []
+    min_height = data.min(axis=0)[2]
+    max_height = data.max(axis=0)[2]
+    height_target = min_height + (max_height - min_height) * percentile
+    for row in data:
+        if row[2] > height_target:
+            data_filtered.append(row[:3])
     return np.array(data_filtered)
 
 
@@ -57,6 +71,7 @@ def calculate_moment_of_inertia(points: np.ndarray, center: np.ndarray, axis_ang
 if __name__ == '__main__':
     raw_data = read_data(filename='input.txt')
     red_points = select_only_red(raw_data)
+    red_points = filter_high_points(red_points)
     center_of_mass = get_center_of_mass(red_points)
 
     moments = []

@@ -16,7 +16,7 @@ else:
 
 '''
 Observation:
-angle_of_brick.py fails test #72 and #89 with WA but according to this test it should output None
+solution.py fails test #72 and #89 with WA but according to this test it should output None
 
 Test #72 has negative Y and X
 Test #89 has positive X and negative Y
