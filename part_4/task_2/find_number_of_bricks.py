@@ -3,7 +3,16 @@ import random
 from colorsys import rgb_to_hsv
 import numpy as np
 
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+
+
+# MAGIC VALUES
+MIN_SATURATION = .69
+MIN_NUMBER_OF_POINTS_IN_BODY = 500
+MIN_VALUE_TO_BECOME_1 = .6
+FILTER_SIZE = 8
+RADIUS_ADDITIVE = 1
+FILENAME = 'samples/2'
 
 
 # Reads a Nx6 matrix from file
@@ -23,7 +32,7 @@ def rgb2hsv(rgb_color: np.ndarray) -> tuple:
 # Determines if color is red, blue or neither, based on its HSV values
 # 1 = red; -1 = blue; 0 = neither
 def get_color(hsv_color: tuple) -> int:
-    if hsv_color[1] < 0.69:
+    if hsv_color[1] < MIN_SATURATION:
         return 0
     if 1 / 3 < hsv_color[0] < 5 / 6:
         return -1
@@ -109,10 +118,8 @@ def filter_bitmap(bitmap_: np.ndarray, kernel_size: int) -> np.ndarray:
     conv_red = convolution2d(bitmap_red, kernel)
     conv_blue = convolution2d(bitmap_blue, kernel)
 
-    conv = np.sign(np.round(conv_red / 1.6) + np.round(conv_blue / 1.6))
-
-    # plt.imshow(conv)
-    # plt.show()
+    conv = np.sign(np.round(conv_red / (MIN_VALUE_TO_BECOME_1 / 0.5)) +
+                   np.round(conv_blue / (MIN_VALUE_TO_BECOME_1 / 0.5)))
 
     return conv.astype(int)
 
@@ -181,9 +188,27 @@ def label_components_of_binary_bitmap(bitmap_: np.ndarray) -> (np.ndarray, int):
                     queue.append(to)
 
     # 2nd pass of CCL algorithm
+    points_in_region = {}
     for indexes, value in np.ndenumerate(bitmap_):
         if value != 0:
             bitmap_[indexes[0], indexes[1]] = equivalences[value]
+            try:
+                points_in_region[equivalences[value]] += 1
+            except KeyError:
+                points_in_region[equivalences[value]] = 1
+
+    # Select regions small enough to delete
+    regions_to_delete = []
+    for key in points_in_region:
+        if points_in_region[key] < MIN_NUMBER_OF_POINTS_IN_BODY:
+            regions_to_delete.append(key)
+
+    components -= len(regions_to_delete)
+
+    # Delete selected regions
+    for index, value in np.ndenumerate(bitmap_):
+        if value in regions_to_delete:
+            bitmap_[index[0], index[1]] = 0
 
     return bitmap_, components
 
@@ -305,12 +330,12 @@ def convert_labeled_bitmap_to_array_of_points_arrays(bitmap_: np.ndarray, number
 
 
 if __name__ == '__main__':
-    raw_data = read_data(filename='input.txt')
+    raw_data = read_data(filename=FILENAME)
     colored_data = convert_colors(raw_data)
     boundaries = get_image_boundaries(colored_data)
 
     bitmap = points_to_bitmap(colored_data, boundaries)
-    filtered = filter_bitmap(bitmap, 10)
+    filtered = filter_bitmap(bitmap, FILTER_SIZE)
 
     filtered_points = bitmap_to_points(filtered)
     filtered_points = np.abs(filtered_points)  # Making the bitmap of 0;1 instead of 0;1;-1
@@ -319,11 +344,11 @@ if __name__ == '__main__':
     binary_filtered_bitmap = points_to_bitmap(filtered_points, boundaries)
     labeled_bitmap, number_of_bodies = label_components_of_binary_bitmap(binary_filtered_bitmap)
 
-    # plt.imshow(labeled_bitmap)
-    # plt.show()
+    plt.imshow(labeled_bitmap)
+    plt.show()
 
     if number_of_bodies < 2:
-        print(number_of_bodies)
+        result = number_of_bodies
     else:
         bodies = convert_labeled_bitmap_to_array_of_points_arrays(labeled_bitmap, number_of_bodies)
         circles = []
@@ -338,11 +363,13 @@ if __name__ == '__main__':
                     body = np.array(bodies[i])
                     circle = circles[j]
                     body_relative = body - circle[:2]
-                    distances_to_center_sq = np.square(body_relative[:, 0]) + np.square(body_relative[:, 1])
-                    min_distance_sq = np.min(distances_to_center_sq)
-                    if min_distance_sq < (circle[2] * 1.25) ** 2:
+                    distances_to_center = np.sqrt(np.square(body_relative[:, 0]) + np.square(body_relative[:, 1]))
+                    min_distance = np.min(distances_to_center)
+                    if min_distance < (circle[2] + RADIUS_ADDITIVE):
                         collisions += 1
             if collisions == 0:
                 non_colliding_bodies += 1
 
-        print(non_colliding_bodies)
+        result = non_colliding_bodies
+
+    print(result)
