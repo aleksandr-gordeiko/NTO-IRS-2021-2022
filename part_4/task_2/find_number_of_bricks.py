@@ -3,22 +3,29 @@ import random
 from colorsys import rgb_to_hsv
 import numpy as np
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
 # MAGIC VALUES
+Z_THRESHOLDING = .69
 MIN_SATURATION = .69
 MIN_NUMBER_OF_POINTS_IN_BODY = 500
-MIN_VALUE_TO_BECOME_1 = .6
+MIN_VALUE_TO_BECOME_1 = .69
 FILTER_SIZE = 8
-RADIUS_ADDITIVE = 1
-FILENAME = 'samples/2'
+RADIUS_ADDITIVE = 4
+FILENAME = 'input.txt'
 
 
 # Reads a Nx6 matrix from file
 def read_data(filename: str) -> np.ndarray:
     data = np.fromfile(filename, dtype=int, count=-1, sep=' ', offset=0)
     data = np.reshape(data, (-1, 6))
+
+    min_z = np.min(data[:, 2])
+    max_z = np.max(data[:, 2])
+    z_threshold = min_z + (max_z - min_z) * Z_THRESHOLDING
+    data = data[data[:, 2] > z_threshold, :]
+
     data = np.delete(data, 2, 1)
     return data
 
@@ -344,8 +351,8 @@ if __name__ == '__main__':
     binary_filtered_bitmap = points_to_bitmap(filtered_points, boundaries)
     labeled_bitmap, number_of_bodies = label_components_of_binary_bitmap(binary_filtered_bitmap)
 
-    plt.imshow(labeled_bitmap)
-    plt.show()
+    # plt.imshow(labeled_bitmap)
+    # plt.show()
 
     if number_of_bodies < 2:
         result = number_of_bodies
