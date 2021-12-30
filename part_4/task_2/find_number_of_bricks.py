@@ -96,16 +96,25 @@ def convolution2d(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     return new_image
 
 
-# Applies a low-pass filter to a bitmap
+# Applies a low-pass filter to a 0;1;-1 bitmap
 def filter_bitmap(bitmap_: np.ndarray, kernel_size: int) -> np.ndarray:
     kernel_shape = (kernel_size, kernel_size)
 
     kernel = np.ones(kernel_shape)
     kernel = kernel / np.sum(kernel)
 
-    conv = convolution2d(bitmap_, kernel)
+    bitmap_red = np.floor_divide(bitmap_ + 1, 2)
+    bitmap_blue = np.floor_divide(bitmap_ - 1, -2)
 
-    return np.round(conv).astype(int)
+    conv_red = convolution2d(bitmap_red, kernel)
+    conv_blue = convolution2d(bitmap_blue, kernel)
+
+    conv = np.sign(np.round(conv_red / 1.6) + np.round(conv_blue / 1.6))
+
+    # plt.imshow(conv)
+    # plt.show()
+
+    return conv.astype(int)
 
 
 def bitmap_to_points(bitmap_: np.ndarray) -> np.ndarray:
@@ -301,7 +310,7 @@ if __name__ == '__main__':
     boundaries = get_image_boundaries(colored_data)
 
     bitmap = points_to_bitmap(colored_data, boundaries)
-    filtered = filter_bitmap(bitmap, 12)
+    filtered = filter_bitmap(bitmap, 10)
 
     filtered_points = bitmap_to_points(filtered)
     filtered_points = np.abs(filtered_points)  # Making the bitmap of 0;1 instead of 0;1;-1
