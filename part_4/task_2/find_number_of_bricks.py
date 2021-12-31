@@ -7,12 +7,12 @@ import numpy as np
 
 
 # MAGIC VALUES
-Z_THRESHOLDING = .69
+Z_THRESHOLDING = .6
 MIN_SATURATION = .69
 MIN_NUMBER_OF_POINTS_IN_BODY = 500
 MIN_VALUE_TO_BECOME_1 = .69
-FILTER_SIZE = 8
-RADIUS_ADDITIVE = 4
+FILTER_SIZE = 1
+RADIUS_ADDITIVE = 0
 FILENAME = 'input.txt'
 
 
@@ -113,7 +113,7 @@ def convolution2d(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
 
 
 # Applies a low-pass filter to a 0;1;-1 bitmap
-def filter_bitmap(bitmap_: np.ndarray, kernel_size: int) -> np.ndarray:
+def filter_bitmap(bitmap_: np.ndarray, kernel_size: int) -> (np.ndarray, np.ndarray):
     kernel_shape = (kernel_size, kernel_size)
 
     kernel = np.ones(kernel_shape)
@@ -125,19 +125,10 @@ def filter_bitmap(bitmap_: np.ndarray, kernel_size: int) -> np.ndarray:
     conv_red = convolution2d(bitmap_red, kernel)
     conv_blue = convolution2d(bitmap_blue, kernel)
 
-    conv = np.sign(np.round(conv_red / (MIN_VALUE_TO_BECOME_1 / 0.5)) +
-                   np.round(conv_blue / (MIN_VALUE_TO_BECOME_1 / 0.5)))
+    conv_red = np.round(conv_red / (MIN_VALUE_TO_BECOME_1 / 0.5)).astype(int)
+    conv_blue = np.round(conv_blue / (MIN_VALUE_TO_BECOME_1 / 0.5)).astype(int)
 
-    return conv.astype(int)
-
-
-def bitmap_to_points(bitmap_: np.ndarray) -> np.ndarray:
-    points = []
-    for index, value in np.ndenumerate(bitmap_):
-        if value != 0:
-            points.append([index[1], index[0], value])
-
-    return np.array(points)
+    return conv_red, conv_blue
 
 
 # Labels regions of ones on a zero-one bitmap
@@ -218,6 +209,15 @@ def label_components_of_binary_bitmap(bitmap_: np.ndarray) -> (np.ndarray, int):
             bitmap_[index[0], index[1]] = 0
 
     return bitmap_, components
+
+
+def merge_labeled_bitmaps(bitmap_1: np.ndarray, bitmap_2: np.ndarray) -> np.ndarray:
+    bitmap_2 = np.negative(bitmap_2)
+    for index, value in np.ndenumerate(bitmap_1):
+        if value != 0:
+            bitmap_2[index[0], index[1]] = value
+
+    return bitmap_2
 
 
 def make_circle(points):
@@ -342,14 +342,13 @@ if __name__ == '__main__':
     boundaries = get_image_boundaries(colored_data)
 
     bitmap = points_to_bitmap(colored_data, boundaries)
-    filtered = filter_bitmap(bitmap, FILTER_SIZE)
+    red_bitmap, blue_bitmap = filter_bitmap(bitmap, FILTER_SIZE)
 
-    filtered_points = bitmap_to_points(filtered)
-    filtered_points = np.abs(filtered_points)  # Making the bitmap of 0;1 instead of 0;1;-1
+    red_labeled_bitmap, number_of_red_bodies = label_components_of_binary_bitmap(red_bitmap)
+    blue_labeled_bitmap, number_of_blue_bodies = label_components_of_binary_bitmap(blue_bitmap)
 
-    boundaries = get_image_boundaries(filtered_points)
-    binary_filtered_bitmap = points_to_bitmap(filtered_points, boundaries)
-    labeled_bitmap, number_of_bodies = label_components_of_binary_bitmap(binary_filtered_bitmap)
+    labeled_bitmap = merge_labeled_bitmaps(red_labeled_bitmap, blue_labeled_bitmap)
+    number_of_bodies = number_of_red_bodies + number_of_blue_bodies
 
     # plt.imshow(labeled_bitmap)
     # plt.show()
