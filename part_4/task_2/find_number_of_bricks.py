@@ -7,7 +7,8 @@ import numpy as np
 
 
 # MAGIC VALUES
-Z_THRESHOLDING = .6
+MIN_POINTS_FOR_Z_THRESHOLD = 500
+Z_THRESHOLD_MARGIN = 0
 MIN_SATURATION = .69
 MIN_NUMBER_OF_POINTS_IN_BODY = 500
 MIN_VALUE_TO_BECOME_1 = .69
@@ -16,15 +17,23 @@ RADIUS_ADDITIVE = 0
 FILENAME = 'input.txt'
 
 
-# Reads a Nx6 matrix from file
+# Reads a Nx5 matrix from file
 def read_data(filename: str) -> np.ndarray:
     data = np.fromfile(filename, dtype=int, count=-1, sep=' ', offset=0)
     data = np.reshape(data, (-1, 6))
 
     min_z = np.min(data[:, 2])
     max_z = np.max(data[:, 2])
-    z_threshold = min_z + (max_z - min_z) * Z_THRESHOLDING
-    data = data[data[:, 2] > z_threshold, :]
+    z_distribution = np.zeros(max_z - min_z + 1)
+    for row in data:
+        color = get_color(rgb2hsv(row[3:]))
+        if color != 0:
+            z_distribution[row[2] - min_z] += 1
+    z_threshold = min_z
+    for i in range(len(z_distribution) - 1, -1, -1):
+        if z_distribution[i] >= MIN_POINTS_FOR_Z_THRESHOLD:
+            z_threshold = min_z + i - Z_THRESHOLD_MARGIN
+    data = data[data[:, 2] >= z_threshold]
 
     data = np.delete(data, 2, 1)
     return data
