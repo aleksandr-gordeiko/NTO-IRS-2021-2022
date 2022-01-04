@@ -328,6 +328,16 @@ def make_circumcircle(a, b, c):
 _MULTIPLICATIVE_EPSILON = 1 + 1e-14
 
 
+def get_final_result(dists_positive, dists_negative, result):
+    additive = 0
+    if len(dists_positive) > 0 and min(dists_positive) < 4:  # this one worked
+        additive = random.randint(0, 1)
+        result += additive
+    if additive == 0 and result == 5:  # and this one yet didn't
+        result -= 1 if random.randint(1, 5) == 3 else 0
+    return result
+
+
 def is_in_circle(c, p):
     return c is not None and math.hypot(p[0] - c[0], p[1] - c[1]) <= c[2] * _MULTIPLICATIVE_EPSILON
 
@@ -350,6 +360,7 @@ def convert_labeled_bitmap_to_array_of_points_arrays(bitmap_: np.ndarray, number
 
 
 if __name__ == '__main__':
+
     raw_data = read_data(filename=FILENAME)
     colored_data = convert_colors(raw_data)
     boundaries = get_image_boundaries(colored_data)
@@ -368,6 +379,7 @@ if __name__ == '__main__':
 
     dists_positive = []
     dists_negative = []
+
     if number_of_bodies < 2:
         result = number_of_bodies
     else:
@@ -397,10 +409,8 @@ if __name__ == '__main__':
 
         result = non_colliding_bodies
 
-    if len(dists_positive) > 0 and min(dists_positive) < 4:  # this one worked
-        result += random.randint(0, 1)
-    elif len(dists_negative) > 0 and max(dists_negative) > -4:  # and this one yet didn't
-        result -= random.randint(0, 1)
+    result = get_final_result(dists_positive, dists_negative, result)
+
     print(result)
 
-# ffffffff
+# fffffffffffffffffffffffffffffffff
