@@ -7,7 +7,7 @@ from vedo import *
 MIN_POINTS_FOR_Z_THRESHOLD = 500
 Z_THRESHOLD_MARGIN = 2
 MIN_SATURATION = .69
-FILENAME = '../part_4/task_2/samples/1'
+FILENAME = '../qualifiers/part_4/task_2/samples/1'
 
 
 def rgb2hsv(rgb_color: np.ndarray) -> tuple:
