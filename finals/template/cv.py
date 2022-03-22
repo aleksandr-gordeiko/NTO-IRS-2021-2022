@@ -97,8 +97,8 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
                 color_obj = 'blue'
             else:
                 color_obj = 'none'
-            center_meters[0] = (round(((obj[0][0] + min_x) / 1000), 4))                 # X
-            center_meters[1] = (round(((obj[0][1] + min_y) / 1000), 4))                 # Y
+            center_meters[1] = (round(((obj[0][0] + min_x) / 1000), 4)) * -1            # X\Y
+            center_meters[0] = (round(((obj[0][1] + min_y) / 1000), 4)) * -1            # Y\X
             center_z = img_height[int(obj[0][1])][int(obj[0][0])] / 1000                # Z
             long_edge = obj[1][0]
             if long_edge > 70:
