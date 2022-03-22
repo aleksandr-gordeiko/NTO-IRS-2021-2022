@@ -26,7 +26,8 @@ def main():
 
 
     robot.set_tcp(gripper_tcp)
-    robot.movel([0/1000, 0/1000, -580/1000, 0, 0, 0], 0.2, 0.2)
+    robot.movel([0.075, 0.15, -580/1000, 0, 0, 0], 0.2, 0.2)
+    robot.movel([-0.090, 0.15, -580/1000, 0, 0, 0], 0.2, 0.2)
 
     robot.close()
 
