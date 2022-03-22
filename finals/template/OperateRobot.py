@@ -1,9 +1,9 @@
 import urx
 import math
 from coordinates import *
-# pip install git+https://github.com/jkur/python-urx
 
 UPPER_MARGIN = 0.1
+TABLE_Z = -0.5
 
 
 class OperateRobot:
@@ -20,7 +20,7 @@ class OperateRobot:
         self.red_stack_center = [(zone_red_position[1][0] + zone_red_position[0][0]) / 2,
                                  (zone_red_position[1][1] + zone_red_position[0][1]) / 2]
         self.blue_stack_center = [(zone_blue_position[1][0] + zone_blue_position[0][0]) / 2,
-                                 (zone_blue_position[1][1] + zone_blue_position[0][1]) / 2]
+                                  (zone_blue_position[1][1] + zone_blue_position[0][1]) / 2]
 
     def movel(self, point: list[float]):
         self.rob.movel(point, 0.2, 0.2)
@@ -42,6 +42,9 @@ class OperateRobot:
     # Higher level functions ######################################
 
     def move_to_camera_position(self):
+        # set camera tcp
+        # move to 0 0 0 0 0 0
+        # set tool tcp
         self.movel(self.camera_position)
 
     def pick_object(self, obj_xyz: list[float], obj_orientation: float, long=False):
@@ -66,10 +69,9 @@ class OperateRobot:
 
     def stack_object(self, obj_orientation: float, obj_height: float, stack_color: str, long=False):
         if stack_color == 'red':
-            stack_top = [self.red_stack_center[0], self.red_stack_center[1], self.red_height]
+            stack_top = [self.red_stack_center[0], self.red_stack_center[1], TABLE_Z + self.red_height]
             self.red_height += obj_height
         else:
-            stack_top = [self.blue_stack_center[0], self.blue_stack_center[1], self.blue_height]
+            stack_top = [self.blue_stack_center[0], self.blue_stack_center[1], TABLE_Z + self.blue_height]
             self.blue_height += obj_height
         self.place_object(stack_top, obj_orientation, long)
-

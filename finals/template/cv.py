@@ -3,8 +3,8 @@ from OperateCamera import OperateCamera
 from OperateRobot import OperateRobot
 import open3d as o3d
 import numpy as np
-import copy
-import math
+# import copy
+# import math
 import cv2
 
 
@@ -20,7 +20,6 @@ class Brick:
 def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float):
     rob.move_to_camera_position()
     frame = cam.catch_frame()
-    # Image
     dots = o3d.io.read_point_cloud(frame)
     hsv_min = np.array([0, 201, 63])
     hsv_max = np.array([139, 255, 136])
@@ -60,9 +59,9 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         else:
             img[i[1] - min_y][i[0] - min_x] = (50, 50, 50)
         img_height[i[1] - min_y][i[0] - min_x] = i[2]
-    img = cv2.flip(img, 0)
-    img_height = cv2.flip(img_height, 0)
-    img_copy = copy.deepcopy(img)
+    # img = cv2.flip(img, 0)
+    # img_height = cv2.flip(img_height, 0)
+    # img_copy = copy.deepcopy(img)
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img_range = cv2.inRange(img_hsv, hsv_min, hsv_max)
 
@@ -98,19 +97,24 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
                 color_obj = 'blue'
             else:
                 color_obj = 'none'
-            center_meters[0] = (round(((obj[0][0] + min_x) / 1000), 4))                 # X
-            center_meters[1] = (round(((obj[0][1] + min_y) / 1000), 4))                 # Y
-            center_z = img_height[int(obj[0][1])][int(obj[0][0])]                       # Z
+            center_meters[1] = (round(((obj[0][0] + min_x) / 1000), 4)) * -1            # X\Y
+            center_meters[0] = (round(((obj[0][1] + min_y) / 1000), 4)) * -1            # Y\X
+            center_z = img_height[int(obj[0][1])][int(obj[0][0])] / 1000                # Z
             long_edge = obj[1][0]
-            if long_edge > 70: lb = True
-            else: lb = False
+            if long_edge > 70:
+                lb = True
+            else:
+                lb = False
             angle = obj[2] * (np.pi / 180.)                                             # RAD
 
             new_brick = Brick(color_obj, center_meters, center_z, angle, lb)
             brick_data.append(new_brick)
             # print(new_brick.color, new_brick.center_xy, new_brick.orientation)
-    old_z = previous_brick.center_z
-    brick_pos = previous_brick.center_xy
-    new_z = img_height[int(brick_pos[1] * 1000 - min_y), int(brick_pos[0] * 1000 - min_x)]
-    dif_z = new_z - old_z
+    if previous_brick:
+        old_z = previous_brick.center_z
+        brick_pos = previous_brick.center_xy
+        new_z = img_height[int(brick_pos[0] * 1000 - min_y), int(brick_pos[1] * 1000 - min_x)]  # swap axes
+        dif_z = new_z - old_z
+    else:
+        dif_z = 0
     return brick_data, dif_z
