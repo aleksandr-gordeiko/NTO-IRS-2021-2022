@@ -11,6 +11,7 @@ class OperateRobot:
         self.red_height = 0
         self.blue_height = 0
         self.rob.set_csys(cameratransform_base)
+        self.rob.set_tcp(gripper_tcp)
 
     def movel(self, point: list[float]):
         self.rob.movel(point, 0.2, 0.2)

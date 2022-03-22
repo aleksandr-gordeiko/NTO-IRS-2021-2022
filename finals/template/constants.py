@@ -13,8 +13,8 @@ camera_tcp = [-29.7 / 1000, 29.7 / 1000, 79.0 / 1000, 0.9142, 2.2072, -0.3787]
 gripper_tcp = [0, 0, 274 / 1000, 1.202, 2.902, 0]
 zero_position = [0, 0, 0, 0, 0, 0]
 
-HSV_MIN = np.array([0, 201, 63])
+HSV_MIN = np.array([0, 82, 0])
 HSV_MAX = np.array([139, 255, 136])
-MIN_Y, MAX_Y = -227, 210
-MIN_X, MAX_X = -394, 391
+MIN_Y, MAX_Y = -260, 248
+MIN_X, MAX_X = -451, 443
 LIM_H = -800

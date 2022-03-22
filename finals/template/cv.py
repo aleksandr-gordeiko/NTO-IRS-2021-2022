@@ -35,15 +35,6 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
 
     for i in dots.colors:
 
-        if min_y > int(dots.points[cur][1] * 1000):
-            min_y = int(dots.points[cur][1] * 1000)
-        elif max_y < int(dots.points[cur][1] * 1000):
-            max_y = int(dots.points[cur][1] * 1000)
-        if min_x > int(dots.points[cur][0] * 1000):
-            min_x = int(dots.points[cur][0] * 1000)
-        elif max_x < int(dots.points[cur][0] * 1000):
-            max_x = int(dots.points[cur][0] * 1000)
-
         if (int(i[0] * 255) - 5. > int(i[1] * 255)) and (int(i[0] * 255) - 10. > int(i[2] * 255)) \
                 and (int(dots.points[cur][2] * 1000) > -630):
             red_points.append(
@@ -79,6 +70,8 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     # cv2.waitKey(7000)
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img_range = cv2.inRange(img_hsv, HSV_MIN, HSV_MAX)
+    cv2.imshow("test", img_range)
+    cv2.waitKey(7000)
 
     contours, hierarchy = cv2.findContours(img_range, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
