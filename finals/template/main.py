@@ -4,7 +4,7 @@ from constants import *
 
 
 def main():
-    rob = OperateRobot("172.31.1.25")
+    rob = OperateRobot(IP)
     cam = OperateCamera()
 
     bricks, previous_brick_height = analyze_image(cam, rob, None)

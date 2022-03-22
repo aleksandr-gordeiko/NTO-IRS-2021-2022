@@ -20,7 +20,8 @@ class Brick:
 def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float):
     rob.move_to_camera_position()
     frame = cam.catch_frame()
-    dots = o3d.io.read_point_cloud(frame)
+    cam.save("test.ply")
+    dots = o3d.io.read_point_cloud("test.ply")
     hsv_min = np.array([0, 201, 63])
     hsv_max = np.array([139, 255, 136])
     red_points = []
@@ -46,7 +47,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         cur += 1
     img = np.zeros((max_y - min_y + 1, max_x - min_x + 1, 3), np.uint8)
     img_height = np.zeros((max_y - min_y + 1, max_x - min_x + 1))
-    lim_h = -600
+    lim_h = -800
     for i in red_points:
         if i[2] > lim_h:
             img[i[1] - min_y][i[0] - min_x] = i[3]
@@ -59,9 +60,11 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         else:
             img[i[1] - min_y][i[0] - min_x] = (50, 50, 50)
         img_height[i[1] - min_y][i[0] - min_x] = i[2]
-    # img = cv2.flip(img, 0)
-    # img_height = cv2.flip(img_height, 0)
+    img = cv2.flip(img, 1)
+    img_height = cv2.flip(img_height, 1)
     # img_copy = copy.deepcopy(img)
+    # cv2.imshow("test", img)
+    # cv2.waitKey(7000)
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img_range = cv2.inRange(img_hsv, hsv_min, hsv_max)
 
