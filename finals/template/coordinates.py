@@ -1,2 +1,2 @@
 def cloud2robot(cloud_coords: list[float]) -> list[float]:
-    pass
+    return cloud_coords

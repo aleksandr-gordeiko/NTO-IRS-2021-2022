@@ -1,11 +1,10 @@
 from operator import attrgetter
 from cv import *
-
-BLOCK_MIN_HEIGHT = 0.02
+from constants import *
 
 
 def main():
-    rob = OperateRobot("172.31.1.25", [0, 0, 0, 0, 0, 0], [[0, 0], [0, 0]], [[0, 0], [0, 0]])
+    rob = OperateRobot("172.31.1.25")
     cam = OperateCamera()
 
     bricks, previous_brick_height = analyze_image(cam, rob, None)

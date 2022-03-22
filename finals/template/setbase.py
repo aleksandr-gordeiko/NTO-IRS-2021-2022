@@ -9,7 +9,7 @@ from math import pi
 
 def main():
     # Connection to the robot
-    robot = urx.Robot("192.168.56.101")
+    robot = urx.Robot("172.31.1.25")  # 192.168.56.101
 
     # Initialization
     cameratransform_base = Transform(Orientation(), Vector(-831.81 / 1000, 40.21 / 1000, 707.37 / 1000))
@@ -22,6 +22,7 @@ def main():
     # Taking a photo
     robot.set_tcp(camera_tcp)
     robot.movel(zeroposition, 0.2, 0.2)
+
 
 
     robot.set_tcp(gripper_tcp)
