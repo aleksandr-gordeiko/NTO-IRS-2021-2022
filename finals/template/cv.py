@@ -113,7 +113,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     if previous_brick:
         old_z = previous_brick.center_z
         brick_pos = previous_brick.center_xy
-        new_z = img_height[int(brick_pos[1] * 1000 - min_y), int(brick_pos[0] * 1000 - min_x)]
+        new_z = img_height[int(brick_pos[0] * 1000 - min_y), int(brick_pos[1] * 1000 - min_x)]  # swap axes
         dif_z = new_z - old_z
     else:
         dif_z = 0
