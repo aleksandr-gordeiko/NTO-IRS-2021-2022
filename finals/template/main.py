@@ -5,6 +5,7 @@ from constants import *
 
 def main():
     rob = OperateRobot(IP)
+    # rob.move_to_camera_position()
     cam = OperateCamera()
 
     bricks, previous_brick_height = analyze_image(cam, rob, None)
