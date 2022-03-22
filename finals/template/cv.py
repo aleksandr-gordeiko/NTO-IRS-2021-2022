@@ -72,8 +72,8 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         else:
             img[i[1] - min_y][i[0] - min_x] = (50, 50, 50)
         img_height[i[1] - min_y][i[0] - min_x] = i[2]
-    img = cv2.flip(img, 1)
-    img_height = cv2.flip(img_height, 1)
+    img = cv2.flip(img, 0)
+    img_height = cv2.flip(img_height, 0)
     # img_copy = copy.deepcopy(img)
     # cv2.imshow("test", img)
     # cv2.waitKey(7000)
