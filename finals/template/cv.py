@@ -1,6 +1,7 @@
 from typing import Optional
 from OperateCamera import OperateCamera
 from OperateRobot import OperateRobot
+from constants import *
 import open3d as o3d
 import numpy as np
 # import copy
@@ -22,15 +23,15 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     frame = cam.catch_frame()
     cam.save("test.ply")
     dots = o3d.io.read_point_cloud("test.ply")
-    hsv_min = np.array([0, 201, 63])
-    hsv_max = np.array([139, 255, 136])
     red_points = []
     blue_points = []
     center_meters = [0, 0]
     brick_data = []
     cur, dif_z = 0, 0
-    min_y, max_y = -227, 210
-    min_x, max_x = -394, 391
+
+    min_y, max_y = MIN_Y, MAX_Y
+    min_x, max_x = MIN_X, MAX_X
+    print("Start analyze")
 
     for i in dots.colors:
 
@@ -59,15 +60,14 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     print(min_x, min_y, max_x, max_y)
     img = np.zeros((max_y - min_y + 1, max_x - min_x + 1, 3), np.uint8)
     img_height = np.zeros((max_y - min_y + 1, max_x - min_x + 1))
-    lim_h = -800
     for i in red_points:
-        if i[2] > lim_h:
+        if i[2] > LIM_H:
             img[i[1] - min_y][i[0] - min_x] = i[3]
         else:
             img[i[1] - min_y][i[0] - min_x] = (50, 50, 50)
         img_height[i[1] - min_y][i[0] - min_x] = i[2]
     for i in blue_points:
-        if i[2] > lim_h:
+        if i[2] > LIM_H:
             img[i[1] - min_y][i[0] - min_x] = i[3]
         else:
             img[i[1] - min_y][i[0] - min_x] = (50, 50, 50)
@@ -78,7 +78,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     # cv2.imshow("test", img)
     # cv2.waitKey(7000)
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    img_range = cv2.inRange(img_hsv, hsv_min, hsv_max)
+    img_range = cv2.inRange(img_hsv, HSV_MIN, HSV_MAX)
 
     contours, hierarchy = cv2.findContours(img_range, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
