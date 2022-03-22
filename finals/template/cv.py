@@ -33,6 +33,16 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     min_x, max_x = -394, 391
 
     for i in dots.colors:
+
+        if min_y > int(dots.points[cur][1] * 1000):
+            min_y = int(dots.points[cur][1] * 1000)
+        elif max_y < int(dots.points[cur][1] * 1000):
+            max_y = int(dots.points[cur][1] * 1000)
+        if min_x > int(dots.points[cur][0] * 1000):
+            min_x = int(dots.points[cur][0] * 1000)
+        elif max_x < int(dots.points[cur][0] * 1000):
+            max_x = int(dots.points[cur][0] * 1000)
+
         if (int(i[0] * 255) - 5. > int(i[1] * 255)) and (int(i[0] * 255) - 10. > int(i[2] * 255)) \
                 and (int(dots.points[cur][2] * 1000) > -630):
             red_points.append(
@@ -45,6 +55,8 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
                 [int(dots.points[cur][0] * 1000), int(dots.points[cur][1] * 1000), int(dots.points[cur][2] * 1000),
                  (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))])
         cur += 1
+
+    print(min_x, min_y, max_x, max_y)
     img = np.zeros((max_y - min_y + 1, max_x - min_x + 1, 3), np.uint8)
     img_height = np.zeros((max_y - min_y + 1, max_x - min_x + 1))
     lim_h = -800
