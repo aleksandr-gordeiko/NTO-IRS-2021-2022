@@ -100,12 +100,16 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     img_height = cv2.flip(img_height, 0)
 
     # img_copy = copy.deepcopy(img)
-    # cv2.imshow("test img", img)
-    # cv2.waitKey(7000)'''
+    if DEBUG:
+        cv2.imshow("MAIN_IMG", img)
+        cv2.waitKey(0)
+
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img_range = cv2.inRange(img_hsv, HSV_MIN, HSV_MAX)
-    # cv2.imshow("test", img_range)
-    # cv2.waitKey(7000)
+
+    if DEBUG:
+        cv2.imshow("FILT_IMG", img_range)
+        cv2.waitKey(0)
 
     contours, hierarchy = cv2.findContours(img_range, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -113,8 +117,8 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     contours_plus = []
     for cntr in contours:
         if int(hierarchy[0][h][3]) == -1:
-            mom = cv2.moments(cntr, 1)
-            if int(mom["m00"]) > 100:
+            moments = cv2.moments(cntr, 1)
+            if int(moments["m00"]) > 100:
                 # cv2.drawContours(img, cntr, -1, (255, 0, 255))
                 contours_plus.append(cntr)
                 # obj = cv2.minAreaRect(cntr)
@@ -128,6 +132,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         # box = cv2.boxPoints(obj)
         # box = np.int0(box)
 
+        print_if_debug("OBJ:")
         print_if_debug(str(obj))
 
         area = int(obj[1][0] * obj[1][1])
@@ -141,15 +146,16 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
                 color_obj = 'blue'
             else:
                 color_obj = 'none'
+
             center_meters[1] = (round(((obj[0][0] + min_x) / 1000), 4)) * -1            # X\Y
             center_meters[0] = (round(((obj[0][1] + min_y) / 1000), 4)) * -1            # Y\X
             center_z = img_height[round(obj[0][1])][round(obj[0][0])] / 1000            # Z
 
             p = 2
-
             while center_z == 0:
                 center_z = img_height[int(cntr[p][0][1])][int(cntr[p][0][0])]
                 p += 1
+
             long_edge = obj[1][0]
             if long_edge > 70:
                 lb = True
@@ -166,9 +172,10 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
             print_if_debug("Angle")
             print_if_debug(str(new_brick.orientation))
 
-            cv2.circle(img_range, (obj[0][0], obj[0][1]), 2, (0, 255, 0))
-            cv2.imshow("test", img_range)
-            cv2.waitKey(0)
+            cv2.circle(img_range, (int(obj[0][0]), int(obj[0][1])), 2, (0, 255, 0))
+            if DEBUG:
+                cv2.imshow("test", img_range)
+                cv2.waitKey(0)
 
     if previous_brick:
         old_z = previous_brick.center_z
