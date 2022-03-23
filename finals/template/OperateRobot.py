@@ -46,7 +46,7 @@ class OperateRobot:
 
     def move_to_camera_position(self):
         self.rob.set_tcp(CAMERA_TCP)
-        self.movel(zero_position)
+        self.movel(ZERO_POSITION)
         self.rob.set_tcp(GRIPPER_TCP)
 
     def pick_object(self, obj_xyz: list[float], obj_orientation: float):
