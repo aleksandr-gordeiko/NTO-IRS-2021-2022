@@ -16,6 +16,7 @@ def print_if_debug2(*msgs: str):
 DEBUG = True
 DEBUG_GLEB = False
 DEBUG_PIC = False
+EXPERIMENTAL = True
 
 IP = "172.31.1.25"
 BLOCK_MIN_HEIGHT = 0.02
@@ -44,6 +45,8 @@ MIN_Y, MAX_Y = -282, 269
 MIN_X, MAX_X = -490, 482
 LIM_H = -999
 MAIN_LIM_H = -999
+THRESHOLD_MIN = 0.37
+THRESHOLD_MAX = 1.
 
 ACCELERATION = .2
 VELOCITY =  .2
