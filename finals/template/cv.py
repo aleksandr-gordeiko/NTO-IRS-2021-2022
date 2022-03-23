@@ -4,7 +4,7 @@ from OperateRobot import OperateRobot
 from constants import *
 import open3d as o3d
 import numpy as np
-# import copy
+import copy
 # import math
 import cv2
 
@@ -178,7 +178,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
 
             angle = obj[2] * (np.pi / 180.)                                             # RAD
 
-            new_brick = Brick(color_obj, center_meters, center_z, angle, lb)
+            new_brick = Brick(color_obj, copy.deepcopy(center_meters), center_z, angle, lb)
             brick_data.append(new_brick)
 
             print_if_debug2("Color, XYZ")
