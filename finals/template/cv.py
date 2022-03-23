@@ -161,7 +161,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
             print_if_debug("Z " + str(new_brick.center_z))
             print_if_debug("angle " + str(new_brick.orientation))
 
-            cv2.circle(img_range, (round(((obj[0][0] + min_x) / 1000), 4), round(((obj[0][1] + min_y) / 1000))), 2, (0, 255, 0))
+            cv2.circle(img_range, (obj[0][0], obj[0][1]), 2, (0, 255, 0))
             cv2.imshow("test", img_range)
             cv2.waitKey(0)
 
