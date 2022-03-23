@@ -43,7 +43,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     img = cv2.flip(img, 0)
     img_height = cv2.flip(img_height, 0)
 
-    # img = fill_gaps(img)
+    img = fill_gaps(img)
 
     # img_copy = copy.deepcopy(img)
 
