@@ -10,6 +10,12 @@ def print_if_debug(*msgs: str):
         print(' '.join(msgs))
 
 
+def print_if_debug2(*msgs: str):
+    if DEBUG:
+        msgs = map(str, msgs)
+        print(' '.join(msgs))
+
+
 # JUST
 
 DEBUG = True
