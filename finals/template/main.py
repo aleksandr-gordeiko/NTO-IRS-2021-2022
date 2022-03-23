@@ -1,6 +1,8 @@
 import socket
 from operator import attrgetter
 
+from urx.ursecmon import TimeoutException
+
 from cv import *
 from constants import *
 
@@ -14,7 +16,7 @@ def main():
             cam = OperateCamera()
             print_if_debug("Initializing hardware done")
             break
-        except socket.timeout:
+        except socket.timeout or TimeoutException:
             print_if_debug("Robot connection refused")
 
     bricks, previous_brick_height = analyze_image(cam, rob, None)

@@ -55,7 +55,6 @@ class OperateRobot:
         self.rob.set_tcp(GRIPPER_TCP)
 
     def pick_object(self, obj_xyz: list[float], obj_orientation: float):
-        obj_orientation += math.pi / 2
         xyz = cloud2robot(obj_xyz)
         self.open_gripper()
         self.movel([xyz[0], xyz[1], xyz[2] + UPPER_MARGIN, 0, 0, obj_orientation])
