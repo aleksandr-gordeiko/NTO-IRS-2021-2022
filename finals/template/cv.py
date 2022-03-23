@@ -36,8 +36,10 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     dif_z = 0
 
     print_if_debug2("Start analyze")
-    img, img_height, borders = convert_ply2("PLY\\data_new_set2.ply")
-    min_x, max_x, min_y, max_y, min_z, max_z = borders
+    #img, img_height, borders = convert_ply2("PLY\\data_new_set2.ply")
+    min_x, max_x, min_y, max_y = MIN_X, MAX_X, MIN_Y, MAX_Y
+    borders = min_x, max_x, min_y, max_y
+    img, img_height = convert_ply("PLY\\data_new_set2.ply", min_x, min_y, max_x, max_y)
 
     img = cv2.flip(img, 0)
     img_height = cv2.flip(img_height, 0)
