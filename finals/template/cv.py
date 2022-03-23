@@ -43,6 +43,14 @@ def check_color(main_color, color1, color2):
     return False
 
 
+def fix_array(y, x, min_x, min_y, max_x, max_y):
+    if x >= max_x - min_x:
+        x = max_x - min_x - 1
+    if y >= max_y - min_y:
+        y = max_y - min_y - 1
+    return y, x
+
+
 def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float):
 
     rob.move_to_camera_position()
@@ -72,44 +80,53 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
                  (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))])
         cur += 1
 
-    print_if_debug2("min_x, min_y:")
-    print_if_debug2(str(min_x))
-    print_if_debug2(str(min_y))
-    print_if_debug2("max_x, max_y:")
-    print_if_debug2(str(max_x))
-    print_if_debug2(str(max_y))
+    # print_if_debug2("min_x, min_y:")
+    # print_if_debug2(str(min_x))
+    # print_if_debug2(str(min_y))
+    # print_if_debug2("max_x, max_y:")
+    # print_if_debug2(str(max_x))
+    # print_if_debug2(str(max_y))
 
     img = np.zeros((max_y - min_y + 1, max_x - min_x + 1, 3), np.uint8)
     img_height = np.zeros((max_y - min_y + 1, max_x - min_x + 1))
 
     for i in red_points:
+        y, x = fix_array(i[1] - min_y, i[0] - min_x, min_x, min_y, max_x, max_y)
+
         if i[2] > LIM_H:
-            img[i[1] - min_y][i[0] - min_x] = i[3]
+            img[y][x] = i[3]
         else:
-            img[i[1] - min_y][i[0] - min_x] = (50, 50, 50)
-        img_height[i[1] - min_y][i[0] - min_x] = i[2]
+            img[y][x] = (50, 50, 50)
+
+        img_height[y][x] = i[2]
 
     for i in blue_points:
+        y, x = fix_array(i[1] - min_y, i[0] - min_x, min_x, min_y, max_x, max_y)
+
         if i[2] > LIM_H:
-            img[i[1] - min_y][i[0] - min_x] = i[3]
+            img[y][x] = i[3]
         else:
-            img[i[1] - min_y][i[0] - min_x] = (50, 50, 50)
-        img_height[i[1] - min_y][i[0] - min_x] = i[2]
+            img[y][x] = (50, 50, 50)
+
+        img_height[y][x] = i[2]
 
     img = cv2.flip(img, 0)
     img_height = cv2.flip(img_height, 0)
 
     # img_copy = copy.deepcopy(img)
-    # if DEBUG:
-        # cv2.imshow("MAIN_IMG", img)
-        # cv2.waitKey(0)
+
+    if DEBUG_PIC:
+        cv2.imshow("MAIN_IMG", img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img_range = cv2.inRange(img_hsv, HSV_MIN, HSV_MAX)
 
-    # if DEBUG:
-        # cv2.imshow("FILT_IMG", img_range)
-        # cv2.waitKey(0)
+    if DEBUG_PIC:
+        cv2.imshow("FILT_IMG", img_range)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     contours, hierarchy = cv2.findContours(img_range, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -172,10 +189,11 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
             print_if_debug2("Angle")
             print_if_debug2(str(new_brick.orientation))
 
-            cv2.circle(img_range, (int(obj[0][0]), int(obj[0][1])), 2, (0, 255, 0))
-            # if DEBUG:
-                # cv2.imshow("test", img_range)
-                # cv2.waitKey(0)
+            if DEBUG_PIC:
+                cv2.circle(img_range, (int(obj[0][0]), int(obj[0][1])), 2, (0, 255, 0))
+                cv2.imshow("test", img_range)
+                cv2.waitKey(0)
+                cv2.destroyAllWindows()
 
     if previous_brick:
         old_z = previous_brick.center_z
@@ -185,4 +203,5 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         print(new_z, old_z)
     else:
         dif_z = 0
+
     return brick_data, dif_z
