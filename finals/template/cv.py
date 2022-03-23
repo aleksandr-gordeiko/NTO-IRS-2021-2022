@@ -3,7 +3,6 @@ from cv_lib import *
 from OperateCamera import OperateCamera
 from OperateRobot import OperateRobot
 from constants import *
-import open3d as o3d
 import numpy as np
 import copy
 # import math
@@ -38,49 +37,20 @@ def find_min_max(min_x, min_y, max_x, max_y, i, cur):
     return min_x, min_y, max_x, max_y
 
 
-def check_color(main_color, color1, color2):
-    if ((main_color * 255) - FILTER_COLOR > color1 * 255) and ((main_color * 255) - FILTER_COLOR > color2 * 255):
-        return True
-    return False
-
-
-def fix_array(y, x, min_x, min_y, max_x, max_y):
-    if x >= max_x - min_x:
-        x = max_x - min_x - 1
-    if y >= max_y - min_y:
-        y = max_y - min_y - 1
-    return int(y), int(x)
-
-
 def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float):
     rob.move_to_camera_position()
     frame = cam.catch_frame()
     cam.save("test.ply")
-    dots = o3d.io.read_point_cloud("test.ply")
     center_meters = [0, 0]
     brick_data = []
-    cur, dif_z = 0, 0
+    dif_z = 0
 
     min_y, max_y = MIN_Y, MAX_Y
     min_x, max_x = MIN_X, MAX_X
 
-    img = np.zeros((max_y - min_y + 1, max_x - min_x + 1, 3), np.uint8)
-    img_height = np.zeros((max_y - min_y + 1, max_x - min_x + 1))
-
     print_if_debug2("Start analyze")
+    img, img_height = convert_ply("test.ply", MIN_X, MIN_Y, MAX_X, MAX_Y)
 
-    for i in dots.colors:
-        p = dots.points[cur]
-        y, x = fix_array(p[1] * 1000 - min_y, p[0] * 1000 - min_x, min_x, min_y, max_x, max_y)
-
-        if (check_color(i[0], i[1], i[2])) and (int(dots.points[cur][2] * 1000) > MAIN_LIM_H):
-            img[y][x] = (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))
-        elif (check_color(i[2], i[0], i[1])) and (int(dots.points[cur][2] * 1000) > MAIN_LIM_H):
-            img[y][x] = (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))
-
-        img_height[y][x] = p[2] * 1000
-
-        cur += 1
     cv2.rectangle(img, (0, 0), (450, 1000), (0, 0, 0), -1)
     cv2.rectangle(img, (850, 0), (1000, 1000), (0, 0, 0), -1)
     # print_if_debug2("min_x, min_y:")
@@ -121,18 +91,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         final = final.astype('uint8')
         img_range = final
 
-    # _______
-
-    contours, hierarchy = cv2.findContours(img_range, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-    h = 0
-    contours_plus = []
-    for cntr in contours:
-        if int(hierarchy[0][h][3]) == -1:
-            moments = cv2.moments(cntr, 1)
-            if int(moments["m00"]) > 100:
-                contours_plus.append(cntr)
-        h += 1
+    contours_plus = find_contours(img_range)
 
     for cntr in contours_plus:
         obj = cv2.minAreaRect(cntr)
