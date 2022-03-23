@@ -12,7 +12,7 @@ DEBUG = True
 
 IP = "172.31.1.25"
 BLOCK_MIN_HEIGHT = 0.02
-UPPER_MARGIN = 0.1
+UPPER_MARGIN = 0.15
 TABLE_Z = -0.68
 MIN_RZ = - math.pi / 2
 MAX_RZ = math.pi / 2

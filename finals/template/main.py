@@ -22,6 +22,7 @@ def main():
     bricks, previous_brick_height = analyze_image(cam, rob, None)
     while len(bricks) != 0:
         brick = max(bricks, key=attrgetter('center_z'))
+        print_if_debug(brick)
         rob.pick_object([brick.center_xy[0], brick.center_xy[1], brick.center_z - BLOCK_MIN_HEIGHT], brick.orientation)
         bricks, previous_brick_height = analyze_image(cam, rob, brick)
         rob.stack_object(previous_brick_height, brick.color)

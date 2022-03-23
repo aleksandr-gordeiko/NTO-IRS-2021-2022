@@ -17,6 +17,13 @@ class Brick:
         self.center_xy = center_xy
         self.color = color
 
+    def __repr__(self):
+        return "Center: {};{};{} Orientation: {} Color: {}"\
+            .format(self.center_xy[0], self.center_xy[1], self.center_z, self.orientation, self.color)
+
+    def __str__(self):
+        return self.__repr__()
+
 
 def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float):
     rob.move_to_camera_position()
