@@ -81,7 +81,8 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         img_height[y][x] = p[2] * 1000
 
         cur += 1
-
+    cv2.rectangle(img, (0, 0), (450, 1000), (0, 0, 0), -1)
+    cv2.rectangle(img, (850, 0), (1000, 1000), (0, 0, 0), -1)
     # print_if_debug2("min_x, min_y:")
     # print_if_debug2(str(min_x))
     # print_if_debug2(str(min_y))
