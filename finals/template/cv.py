@@ -58,7 +58,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     min_y, max_y = MIN_Y, MAX_Y
     min_x, max_x = MIN_X, MAX_X
 
-    print_if_debug("Start analyze")
+    print_if_debug2("Start analyze")
 
     for i in dots.colors:
         if (check_color(i[0], i[1], i[2])) and (int(dots.points[cur][2] * 1000) > MAIN_LIM_H):
@@ -72,12 +72,12 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
                  (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))])
         cur += 1
 
-    print_if_debug("min_x, min_y:")
-    print_if_debug(str(min_x))
-    print_if_debug(str(min_y))
-    print_if_debug("max_x, max_y:")
-    print_if_debug(str(max_x))
-    print_if_debug(str(max_y))
+    print_if_debug2("min_x, min_y:")
+    print_if_debug2(str(min_x))
+    print_if_debug2(str(min_y))
+    print_if_debug2("max_x, max_y:")
+    print_if_debug2(str(max_x))
+    print_if_debug2(str(max_y))
 
     img = np.zeros((max_y - min_y + 1, max_x - min_x + 1, 3), np.uint8)
     img_height = np.zeros((max_y - min_y + 1, max_x - min_x + 1))
@@ -100,16 +100,16 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     img_height = cv2.flip(img_height, 0)
 
     # img_copy = copy.deepcopy(img)
-    if DEBUG:
-        cv2.imshow("MAIN_IMG", img)
-        cv2.waitKey(0)
+    # if DEBUG:
+        # cv2.imshow("MAIN_IMG", img)
+        # cv2.waitKey(0)
 
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img_range = cv2.inRange(img_hsv, HSV_MIN, HSV_MAX)
 
-    if DEBUG:
-        cv2.imshow("FILT_IMG", img_range)
-        cv2.waitKey(0)
+    # if DEBUG:
+        # cv2.imshow("FILT_IMG", img_range)
+        # cv2.waitKey(0)
 
     contours, hierarchy = cv2.findContours(img_range, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -132,8 +132,8 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         # box = cv2.boxPoints(obj)
         # box = np.int0(box)
 
-        print_if_debug("OBJ:")
-        print_if_debug(str(obj))
+        print_if_debug2("OBJ:")
+        print_if_debug2(str(obj))
 
         area = int(obj[1][0] * obj[1][1])
         if area > 100:
@@ -167,15 +167,15 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
             new_brick = Brick(color_obj, center_meters, center_z, angle, lb)
             brick_data.append(new_brick)
 
-            print_if_debug("Color, XYZ")
-            print_if_debug(str(new_brick.color), str(new_brick.center_xy), str(new_brick.center_z))
-            print_if_debug("Angle")
-            print_if_debug(str(new_brick.orientation))
+            print_if_debug2("Color, XYZ")
+            print_if_debug2(str(new_brick.color), str(new_brick.center_xy), str(new_brick.center_z))
+            print_if_debug2("Angle")
+            print_if_debug2(str(new_brick.orientation))
 
             cv2.circle(img_range, (int(obj[0][0]), int(obj[0][1])), 2, (0, 255, 0))
-            if DEBUG:
-                cv2.imshow("test", img_range)
-                cv2.waitKey(0)
+            # if DEBUG:
+                # cv2.imshow("test", img_range)
+                # cv2.waitKey(0)
 
     if previous_brick:
         old_z = previous_brick.center_z
