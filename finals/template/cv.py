@@ -25,7 +25,26 @@ class Brick:
         return self.__repr__()
 
 
+def find_min_max(min_x, min_y, max_x, max_y, i, cur):
+    if min_y > int(i[cur][1] * 1000):
+        min_y = int(i[cur][1] * 1000)
+    elif max_y < int(i[cur][1] * 1000):
+        max_y = int(i[cur][1] * 1000)
+    if min_x > int(i[cur][0] * 1000):
+        min_x = int(i[cur][0] * 1000)
+    elif max_x < int(i[cur][0] * 1000):
+        max_x = int(i[cur][0] * 1000)
+    return min_x, min_y, max_x, max_y
+
+
+def check_color(main_color, color1, color2):
+    if ((main_color * 255) - 5. > color1 * 255) and ((main_color * 255) - 10. > color2 * 255):
+        return True
+    return False
+
+
 def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float):
+
     rob.move_to_camera_position()
     frame = cam.catch_frame()
     cam.save("test.ply")
@@ -38,46 +57,43 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
 
     min_y, max_y = MIN_Y, MAX_Y
     min_x, max_x = MIN_X, MAX_X
-    print("Start analyze")
+
+    print_if_debug("Start analyze")
 
     for i in dots.colors:
-        '''if min_y > int(dots.points[cur][1] * 1000):
-            min_y = int(dots.points[cur][1] * 1000)
-        elif max_y < int(dots.points[cur][1] * 1000):
-            max_y = int(dots.points[cur][1] * 1000)
-        if min_x > int(dots.points[cur][0] * 1000):
-            min_x = int(dots.points[cur][0] * 1000)
-        elif max_x < int(dots.points[cur][0] * 1000):
-            max_x = int(dots.points[cur][0] * 1000)'''
-        if (int(i[0] * 255) - 5. > int(i[1] * 255)) and (int(i[0] * 255) - 10. > int(i[2] * 255)) \
-                and (int(dots.points[cur][2] * 1000) > -700):
+        if (check_color(i[0], i[1], i[2])) and (int(dots.points[cur][2] * 1000) > -700):
             red_points.append(
                 [int(dots.points[cur][0] * 1000), int(dots.points[cur][1] * 1000), int(dots.points[cur][2] * 1000),
                  (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))])
 
-        if (int(i[2] * 255) - 5. > int(i[0] * 255)) and (int(i[2] * 255) - 10. > int(i[1] * 255)) \
-                and (int(dots.points[cur][2] * 1000) > -700):
+        if (check_color(i[2], i[0], i[1])) and (int(dots.points[cur][2] * 1000) > -700):
             blue_points.append(
                 [int(dots.points[cur][0] * 1000), int(dots.points[cur][1] * 1000), int(dots.points[cur][2] * 1000),
                  (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))])
         cur += 1
-    print(min_x, min_y, max_x, max_y)
+
+    print_if_debug("min_x, min_y:" + str(min_x, min_y)), print_if_debug("max_x, max_y:" + str(max_x, max_y))
+
     img = np.zeros((max_y - min_y + 1, max_x - min_x + 1, 3), np.uint8)
     img_height = np.zeros((max_y - min_y + 1, max_x - min_x + 1))
+
     for i in red_points:
         if i[2] > LIM_H:
             img[i[1] - min_y][i[0] - min_x] = i[3]
         else:
             img[i[1] - min_y][i[0] - min_x] = (50, 50, 50)
         img_height[i[1] - min_y][i[0] - min_x] = i[2]
+
     for i in blue_points:
         if i[2] > LIM_H:
             img[i[1] - min_y][i[0] - min_x] = i[3]
         else:
             img[i[1] - min_y][i[0] - min_x] = (50, 50, 50)
         img_height[i[1] - min_y][i[0] - min_x] = i[2]
+
     img = cv2.flip(img, 0)
     img_height = cv2.flip(img_height, 0)
+
     # img_copy = copy.deepcopy(img)
     # cv2.imshow("test img", img)
     # cv2.waitKey(7000)'''
@@ -107,6 +123,8 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         # box = cv2.boxPoints(obj)
         # box = np.int0(box)
 
+        print_if_debug(str(obj))
+
         area = int(obj[1][0] * obj[1][1])
         if area > 100:
             # cv2.drawContours(img, [box], -1, (255, 100, 0), 1)  # cur contours
@@ -120,8 +138,10 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
                 color_obj = 'none'
             center_meters[1] = (round(((obj[0][0] + min_x) / 1000), 4)) * -1            # X\Y
             center_meters[0] = (round(((obj[0][1] + min_y) / 1000), 4)) * -1            # Y\X
-            center_z = img_height[int(obj[0][1])][int(obj[0][0])] / 1000                # Z
+            center_z = img_height[round(obj[0][1])][round(obj[0][0])] / 1000            # Z
+
             p = 2
+
             while center_z == 0:
                 center_z = img_height[int(cntr[p][0][1])][int(cntr[p][0][0])]
                 p += 1
@@ -130,11 +150,21 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
                 lb = True
             else:
                 lb = False
+
             angle = obj[2] * (np.pi / 180.)                                             # RAD
 
             new_brick = Brick(color_obj, center_meters, center_z, angle, lb)
             brick_data.append(new_brick)
-            # print(new_brick.color, new_brick.center_xy, new_brick.orientation)
+
+            print_if_debug("Color " + str(new_brick.color))
+            print_if_debug("X Y " + str(new_brick.center_xy))
+            print_if_debug("Z " + str(new_brick.center_z))
+            print_if_debug("angle " + str(new_brick.orientation))
+
+            cv2.circle(img_range, (round(((obj[0][0] + min_x) / 1000), 4), round(((obj[0][1] + min_y) / 1000))), 2, (0, 255, 0))
+            cv2.imshow("test", img_range)
+            cv2.waitKey(0)
+
     if previous_brick:
         old_z = previous_brick.center_z
         brick_pos = previous_brick.center_xy
