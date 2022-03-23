@@ -1,6 +1,14 @@
 import numpy as np
 from math3d import Transform, Orientation, Vector
 
+
+def print_if_debug(msg: str):
+    if DEBUG:
+        print(msg)
+
+
+DEBUG = True
+
 IP = "172.31.1.25"
 BLOCK_MIN_HEIGHT = 0.02
 UPPER_MARGIN = 0.1
