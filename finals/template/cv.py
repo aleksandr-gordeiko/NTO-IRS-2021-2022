@@ -128,6 +128,28 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
+    # _ EXPERIMENTAL _
+
+    if EXPERIMENTAL:
+        img_test = cv2.Canny(img, 0, 255, None, 3, 0)
+        cv2.imshow("frame_test", img_test)
+        dst = cv2.addWeighted(img_range, 1, img_test, -1, 0.0)
+        dist = cv2.distanceTransform(dst, cv2.DIST_L2, 3)
+        cv2.normalize(dist, dist, 0, 1.0, cv2.NORM_MINMAX)
+        dist = dist.astype('float32')
+        dst = dst.astype('float32')
+        final = cv2.addWeighted(dst, 0.001, dist, 1, 0.0)
+        _, final = cv2.threshold(final, 0.37, 1.0, cv2.THRESH_BINARY)
+
+        if DEBUG_PIC:
+            cv2.imshow("frame_cut", final)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
+        final = final.astype('uint8')
+        img_range = final
+
+    # _______
 
     contours, hierarchy = cv2.findContours(img_range, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -137,12 +159,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         if int(hierarchy[0][h][3]) == -1:
             moments = cv2.moments(cntr, 1)
             if int(moments["m00"]) > 100:
-                # cv2.drawContours(img, cntr, -1, (255, 0, 255))
                 contours_plus.append(cntr)
-                # obj = cv2.minAreaRect(cntr)
-                # box = cv2.boxPoints(obj)
-                # box = np.int0(box)
-                # cv2.drawContours(img, [box], -1, (255, 255, 255))  # all contours
         h += 1
 
     for cntr in contours_plus:
@@ -190,11 +207,11 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
             print_if_debug2("Angle")
             print_if_debug2(str(new_brick.orientation))
 
-            if DEBUG_PIC:
-                cv2.circle(img_range, (int(obj[0][0]), int(obj[0][1])), 2, (0, 255, 0))
-                cv2.imshow("test", img_range)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
+            # if DEBUG_PIC:
+                # cv2.circle(img_range, (int(obj[0][0]), int(obj[0][1])), 2, (0, 255, 0))
+                # cv2.imshow("test", img_range)
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
 
     if previous_brick:
         old_z = previous_brick.center_z
