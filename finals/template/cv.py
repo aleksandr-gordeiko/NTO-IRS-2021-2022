@@ -1,4 +1,5 @@
 from typing import Optional
+from cv_lib import *
 from OperateCamera import OperateCamera
 from OperateRobot import OperateRobot
 from constants import *
@@ -110,14 +111,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     # _ EXPERIMENTAL _
 
     if EXPERIMENTAL:
-        img_test = cv2.Canny(img, 0, 255, None, 3, 0)
-        dst = cv2.addWeighted(img_range, 1, img_test, -1, 0.0)
-        dist = cv2.distanceTransform(dst, cv2.DIST_L2, 3)
-        cv2.normalize(dist, dist, 0, 1.0, cv2.NORM_MINMAX)
-        dist = dist.astype('float32')
-        dst = dst.astype('float32')
-        final = cv2.addWeighted(dst, 0.001, dist, 1, 0.0)
-        _, final = cv2.threshold(final, 0.37, 1.0, cv2.THRESH_BINARY)
+        final = slip_obj(img, img_range)
 
         if DEBUG_PIC:
             cv2.imshow("frame_cut", final)
