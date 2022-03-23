@@ -16,8 +16,14 @@ class OperateRobot:
         self.rob.set_tcp(GRIPPER_TCP)
 
     def movel(self, point: list[float]):
-        if not TABLE_Z < point[2] <= 0:
+        if point[2] > 0:
             raise ValueError("Point unreachable: {}".format(point))
+        if point[2] < TABLE_Z:
+            point[2] = TABLE_Z
+        while point[5] < MIN_RZ:
+            point[5] += math.pi
+        while point[5] > MAX_RZ:
+            point[5] -= math.pi
         print_if_debug("Moving to point: {}".format(point))
         try:
             self.rob.movel(point, 0.2, 0.2)

@@ -5,6 +5,7 @@ from constants import *
 
 def main():
     robot = urx.Robot(IP)  #
+    robot.set_csys(CAMERA_CSYS)
     print('ROBOT POSITION:')
     print(robot.getl())
     robot.close()

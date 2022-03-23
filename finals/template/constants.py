@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from math3d import Transform, Orientation, Vector
 
@@ -13,6 +14,8 @@ IP = "172.31.1.25"
 BLOCK_MIN_HEIGHT = 0.02
 UPPER_MARGIN = 0.1
 TABLE_Z = -0.60
+MIN_RZ = 0
+MAX_RZ = 2 * math.pi
 RED_STACK_CENTER = [0.075, 0.15]
 BLUE_STACK_CENTER = [-0.090, 0.15]
 
