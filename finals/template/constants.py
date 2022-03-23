@@ -20,7 +20,7 @@ def print_if_debug2(*msgs: str):
 
 DEBUG = True
 DEBUG_GLEB = False
-DEBUG_PIC = False
+DEBUG_PIC = True
 EXPERIMENTAL = True
 
 IP = "172.31.1.25"

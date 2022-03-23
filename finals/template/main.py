@@ -8,7 +8,7 @@ from constants import *
 
 
 def main():
-    while True:
+    """while True:
         try:
             print_if_debug("Initializing hardware...")
             rob = OperateRobot(IP)
@@ -17,11 +17,11 @@ def main():
             print_if_debug("Initializing hardware done")
             break
         except socket.timeout or TimeoutException:
-            print_if_debug("Robot connection refused")
+            print_if_debug("Robot connection refused")"""
 
     while True:
         try:
-            bricks, previous_brick_height = analyze_image(cam, rob, previous_brick=None)
+            bricks, previous_brick_height = analyze_image(cam=None, rob=None, previous_brick=None)
             while len(bricks) != 0:
                 brick = max(bricks, key=attrgetter('center_z'))
                 print_if_debug("Selected brick:\n", brick)
