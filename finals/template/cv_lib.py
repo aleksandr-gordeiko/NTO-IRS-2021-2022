@@ -14,6 +14,19 @@ def fill_gaps(mat: cv.mat_wrapper, n_iterations=20) -> cv.mat_wrapper:
     return res
 
 
+def find_min_max(min_x, min_y, max_x, max_y, i, cur):
+    if min_y > int(i[cur][1] * 1000):
+        min_y = int(i[cur][1] * 1000)
+    elif max_y < int(i[cur][1] * 1000):
+        max_y = int(i[cur][1] * 1000)
+    if min_x > int(i[cur][0] * 1000):
+        min_x = int(i[cur][0] * 1000)
+    elif max_x < int(i[cur][0] * 1000):
+        max_x = int(i[cur][0] * 1000)
+    print_if_debug2(min_x, min_y, max_x, max_y)
+    return min_x, min_y, max_x, max_y
+
+
 def check_color(main_color, color1, color2):
     if ((main_color * 255) - FILTER_COLOR > color1 * 255) and ((main_color * 255) - FILTER_COLOR > color2 * 255):
         return True
@@ -81,3 +94,8 @@ def slip_obj(src, bin_src):
     # cv.destroyAllWindows()
     _, final = cv.threshold(final, 0.37, 255, cv.THRESH_BINARY)
     return copy.deepcopy(final.astype("uint8"))
+
+
+def create_frame(src, x1=450, x2=850):
+    cv2.rectangle(src, (0, 0), (x1, 1000), (0, 0, 0), -1)
+    cv2.rectangle(src, (x2, 0), (1000, 1000), (0, 0, 0), -1)

@@ -25,18 +25,6 @@ class Brick:
         return self.__repr__()
 
 
-def find_min_max(min_x, min_y, max_x, max_y, i, cur):
-    if min_y > int(i[cur][1] * 1000):
-        min_y = int(i[cur][1] * 1000)
-    elif max_y < int(i[cur][1] * 1000):
-        max_y = int(i[cur][1] * 1000)
-    if min_x > int(i[cur][0] * 1000):
-        min_x = int(i[cur][0] * 1000)
-    elif max_x < int(i[cur][0] * 1000):
-        max_x = int(i[cur][0] * 1000)
-    return min_x, min_y, max_x, max_y
-
-
 def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float):
     rob.move_to_camera_position()
     frame = cam.catch_frame()
@@ -50,18 +38,12 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
 
     print_if_debug2("Start analyze")
     img, img_height = convert_ply("test.ply", MIN_X, MIN_Y, MAX_X, MAX_Y)
-
-    cv2.rectangle(img, (0, 0), (450, 1000), (0, 0, 0), -1)
-    cv2.rectangle(img, (850, 0), (1000, 1000), (0, 0, 0), -1)
-    # print_if_debug2("min_x, min_y:")
-    # print_if_debug2(str(min_x))
-    # print_if_debug2(str(min_y))
-    # print_if_debug2("max_x, max_y:")
-    # print_if_debug2(str(max_x))
-    # print_if_debug2(str(max_y))
+    create_frame(img)
 
     img = cv2.flip(img, 0)
     img_height = cv2.flip(img_height, 0)
+
+    # img = fill_gaps(img)
 
     # img_copy = copy.deepcopy(img)
 
@@ -79,17 +61,13 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         cv2.destroyAllWindows()
 
     # _ EXPERIMENTAL _
-
     if EXPERIMENTAL:
-        final = slip_obj(img, img_range)
-
+        img_range = slip_obj(img, img_range)
         if DEBUG_PIC:
-            cv2.imshow("frame_cut", final)
+            cv2.imshow("frame_cut", img_range)
             cv2.waitKey(0)
             cv2.destroyAllWindows()
-
-        final = final.astype('uint8')
-        img_range = final
+    # _________________
 
     contours_plus = find_contours(img_range)
 
@@ -98,8 +76,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         # box = cv2.boxPoints(obj)
         # box = np.int0(box)
 
-        print_if_debug2("OBJ:")
-        print_if_debug2(str(obj))
+        print_if_debug2("OBJ:", str(obj))
 
         area = int(obj[1][0] * obj[1][1])
         if area > 100:
