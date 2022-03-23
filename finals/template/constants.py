@@ -6,12 +6,8 @@ from math3d import Transform, Orientation, Vector
 
 def print_if_debug(*msgs: str):
     if DEBUG:
-        print(msgs)
-
-
-def print_if_debug2(*msgs: str):
-    if DEBUG_GLEB:
-        print(msgs)
+        msgs = map(str, msgs)
+        print(' '.join(msgs))
 
 
 DEBUG = True
@@ -22,7 +18,8 @@ EXPERIMENTAL = True
 IP = "172.31.1.25"
 BLOCK_MIN_HEIGHT = 0.02
 UPPER_MARGIN = 0.15
-TABLE_Z = -0.6877390937497725
+TABLE_Z = -0.68
+HEIGHT_STEP = 0.005
 MIN_RZ = - math.pi / 2
 MAX_RZ = math.pi / 2
 RED_STACK_CENTER = [0.14945405457701866, 0.29544280594861944]   # 209
