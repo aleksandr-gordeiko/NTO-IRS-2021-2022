@@ -39,13 +39,13 @@ class OperateRobot:
         self.rob.send_program('set_tool_digital_out(0, True)')
         self.rob.send_program('set_tool_digital_out(1, False)')
         print_if_debug("Gripper opened")
-        sleep(GRIPPER_DELAY)
+        sleep(OPENING_TIME)
 
     def close_gripper(self):
         self.rob.send_program('set_tool_digital_out(0, False)')
         self.rob.send_program('set_tool_digital_out(1, True)')
         print_if_debug("Gripper closed")
-        sleep(GRIPPER_DELAY)
+        sleep(CLOSING_TIME)
 
     # Higher level functions ######################################
 

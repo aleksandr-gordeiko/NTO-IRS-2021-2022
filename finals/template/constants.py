@@ -1,4 +1,5 @@
 import math
+
 import numpy as np
 from math3d import Transform, Orientation, Vector
 
@@ -21,7 +22,7 @@ EXPERIMENTAL = True
 IP = "172.31.1.25"
 BLOCK_MIN_HEIGHT = 0.02
 UPPER_MARGIN = 0.15
-TABLE_Z = -0.68
+TABLE_Z = -0.6877390937497725
 MIN_RZ = - math.pi / 2
 MAX_RZ = math.pi / 2
 RED_STACK_CENTER = [0.14945405457701866, 0.29544280594861944]   # 209
@@ -34,7 +35,6 @@ Y_PICKING_OFFSET = 0.1
 CAMERA_CSYS = Transform(Orientation(), Vector(-0.8880396596672806, -0.049594297988055605, 0.7440944822385092))
 CAMERA_TCP = Transform(Orientation([0.9142, 2.2072, -0.3787]), Vector(29.7, -29.7, 79.0) / 1000) \
              * Transform(Orientation(), Vector(0.0104, -0.0442, -0.07553909374))
-# 17.5
 
 GRIPPER_TCP = Transform(Orientation([1.2022, 2.9025, 0]), Vector(0, 0, 274 / 1000))
 ZERO_POSITION = [0, 0, 0, 0, 0, 0]
@@ -49,5 +49,7 @@ THRESHOLD_MIN = 0.37
 THRESHOLD_MAX = 1.
 
 ACCELERATION = .2
-VELOCITY =  .2
-GRIPPER_DELAY = 1
+VELOCITY = .2
+
+OPENING_TIME = 0.26
+CLOSING_TIME = 0.52
