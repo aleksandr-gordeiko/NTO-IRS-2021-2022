@@ -19,7 +19,7 @@ def print_if_debug2(*msgs: str):
 # JUST
 
 DEBUG = True
-DEBUG_GLEB = True
+DEBUG_GLEB = False
 DEBUG_PIC = True
 EXPERIMENTAL = True
 

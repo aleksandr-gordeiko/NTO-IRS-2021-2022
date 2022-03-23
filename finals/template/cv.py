@@ -1,14 +1,12 @@
-import copy
 from typing import Optional
-
-# import math
-import cv2
-import numpy as np
-
+from cv_lib import *
 from OperateCamera import OperateCamera
 from OperateRobot import OperateRobot
 from constants import *
-from cv_lib import *
+import numpy as np
+import copy
+# import math
+import cv2
 
 
 class Brick:
@@ -20,7 +18,7 @@ class Brick:
         self.color = color
 
     def __repr__(self):
-        return "Center: {};{};{} Orientation: {} Color: {}" \
+        return "Center: {};{};{} Orientation: {} Color: {}"\
             .format(self.center_xy[0], self.center_xy[1], self.center_z, self.orientation, self.color)
 
     def __str__(self):
@@ -35,17 +33,17 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     brick_data = []
     dif_z = 0
 
+    min_y, max_y = MIN_Y, MAX_Y
+    min_x, max_x = MIN_X, MAX_X
+
     print_if_debug2("Start analyze")
-    #img, img_height, borders = convert_ply2("PLY\\data_new_set2.ply")
-    min_x, max_x, min_y, max_y = MIN_X, MAX_X, MIN_Y, MAX_Y
-    borders = min_x, max_x, min_y, max_y
-    img, img_height = convert_ply("PLY\\data_new_set2.ply", min_x, min_y, max_x, max_y)
+    img, img_height = convert_ply("PLY\\data_new_set2.ply", MIN_X, MIN_Y, MAX_X, MAX_Y)
 
     img = cv2.flip(img, 0)
     img_height = cv2.flip(img_height, 0)
 
     img = fill_gaps(img)
-    create_frame(img, borders)
+    create_frame(img)
     # img_copy = copy.deepcopy(img)
 
     if DEBUG_PIC:
@@ -91,9 +89,9 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
             else:
                 color_obj = 'none'
 
-            center_meters[1] = (round(((obj[0][0] + min_x) / 1000), 4)) * -1  # X\Y
-            center_meters[0] = (round(((obj[0][1] + min_y) / 1000), 4)) * -1  # Y\X
-            center_z = img_height[round(obj[0][1])][round(obj[0][0])] / 1000  # Z
+            center_meters[1] = (round(((obj[0][0] + min_x) / 1000), 4)) * -1            # X\Y
+            center_meters[0] = (round(((obj[0][1] + min_y) / 1000), 4)) * -1            # Y\X
+            center_z = img_height[round(obj[0][1])][round(obj[0][0])] / 1000            # Z
 
             p = 2
             while center_z == 0:
@@ -106,7 +104,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
             else:
                 lb = False
 
-            angle = obj[2] * (np.pi / 180.)  # RAD
+            angle = obj[2] * (np.pi / 180.)                                             # RAD
 
             new_brick = Brick(color_obj, copy.deepcopy(center_meters), center_z, angle, lb)
             brick_data.append(new_brick)

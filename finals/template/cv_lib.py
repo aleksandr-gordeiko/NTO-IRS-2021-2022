@@ -6,7 +6,6 @@ import open3d as o3d
 from constants import *
 import copy
 
-''' OALEKSANDER '''
 
 def fill_gaps(mat: cv.mat_wrapper, n_iterations=20) -> cv.mat_wrapper:
     res = mat.copy()
@@ -16,85 +15,6 @@ def fill_gaps(mat: cv.mat_wrapper, n_iterations=20) -> cv.mat_wrapper:
                   dst=res, mask=cv.inRange(res, np.zeros(n_channels), np.ones(n_channels) * .1))
     return res
 
-def read_from_file_raw(filename) -> np.ndarray:
-    pointcloud = o3d.io.read_point_cloud(filename)
-    return np.concatenate((pointcloud.points, pointcloud.colors), axis=1)
-
-
-def convert_units(pointcloud) -> np.ndarray:
-    pointcloud[:, 0:3] *= 1000.0  # m to mm
-    pointcloud[:, 3:6] *= 255  # float color to byte color
-    return pointcloud
-
-
-def convert_axis(pointcloud) -> np.ndarray:
-    pointcloud[:, [0, 1]] = pointcloud[:, [1, 0]]
-    # pointcloud[:, 0:1] = -pointcloud[:, 0:1]
-    return pointcloud
-
-
-def round_to_int(pointcloud) -> np.ndarray:
-    return np.rint(pointcloud).astype(np.int16)
-
-
-def save_to_file(pointcloud, filename):
-    np.savetxt(filename, pointcloud)
-
-
-def get_image_borders(pointcloud) -> tuple:
-    x = pointcloud[:, 0]
-    y = pointcloud[:, 1]
-    z = pointcloud[:, 2]
-    return np.min(x), np.max(x), np.min(y), np.max(y), np.min(z), np.max(z)
-
-
-def offset_coordinates(pointcloud, x_offset, y_offset, z_offset) -> np.ndarray:
-    pointcloud[:, 0] += x_offset
-    pointcloud[:, 1] += y_offset
-    pointcloud[:, 2] += z_offset
-    return pointcloud
-
-
-def to_cv2_mat(pointcloud: np.ndarray, borders: tuple) -> cv.mat_wrapper:
-    min_x, max_x, min_y, max_y, min_z, max_z = borders
-    x_height, y_height = max_x - min_x + 1, max_y - min_y + 1
-    rgbmat = np.zeros((x_height, y_height, 3), np.uint8)
-    zmat = np.zeros((x_height, y_height, 1), np.uint8)
-
-    pointcloud[:, [3, 5]] = pointcloud[:, [5, 3]]
-
-    def process_row(row: np.ndarray):
-        rgbmat[int(row[0]), int(row[1])] = row[3:6]
-        zmat[int(row[0]), int(row[1])] = min(int(row[2]), 255)
-
-    def process_cloud(cloud: np.ndarray):
-        np.apply_along_axis(process_row, 1, cloud)
-
-    process_cloud(pointcloud)
-
-    return rgbmat, zmat
-
-
-def flip_mat(mat: cv.mat_wrapper):
-    mat = cv.flip(mat, 0)
-    return mat
-
-
-def convert_ply2(filename):
-    pcloud = read_from_file_raw(filename)
-    pcloud = convert_axis(pcloud)
-    pcloud = convert_units(pcloud)
-    pcloud = round_to_int(pcloud)
-    borders = get_image_borders(pcloud)
-    pcloud = offset_coordinates(pcloud, -borders[0], -borders[2], -borders[4])
-    rgb, height = to_cv2_mat(pcloud, borders)
-    # rgb = fill_gaps(rgb)
-    height = fill_gaps(height)
-    height = height.astype(np.int16)
-    height[:, :, 0] += borders[4]
-    return flip_mat(rgb), flip_mat(height), borders
-
-''' GLEB '''
 
 def find_min_max(min_x, min_y, max_x, max_y, i, cur):
     if min_y > int(i[cur][1] * 1000):
@@ -172,9 +92,8 @@ def slip_obj(src, bin_src):
     return copy.deepcopy(final.astype("uint8"))
 
 
-def create_frame(src, borders, x1=450, x2=850):
-    min_x, max_x, min_y, max_y = borders
-    mask = np.zeros((max_y - min_y + 1, max_x - min_x + 1), np.uint8)
+def create_frame(src, x1=450, x2=850):
+    mask = np.zeros((MAX_Y - MIN_Y + 1, MAX_X - MIN_X + 1), np.uint8)
     cv2.rectangle(mask, (450, 100), (900, 470), 255, -1)
     final = cv2.bitwise_and(src, src, mask=mask)
     cv2.imshow("jdd", final)
