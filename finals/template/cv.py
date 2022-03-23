@@ -26,9 +26,9 @@ class Brick:
 
 
 def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float):
-    rob.move_to_camera_position()
+    '''rob.move_to_camera_position()
     frame = cam.catch_frame()
-    cam.save("test.ply")
+    cam.save("test.ply")'''
     center_meters = [0, 0]
     brick_data = []
     dif_z = 0
@@ -37,7 +37,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     min_x, max_x = MIN_X, MAX_X
 
     print_if_debug2("Start analyze")
-    img, img_height = convert_ply("test.ply", MIN_X, MIN_Y, MAX_X, MAX_Y)
+    img, img_height = convert_ply("PLY\\data_new_set2.ply", MIN_X, MIN_Y, MAX_X, MAX_Y)
     create_frame(img)
 
     img = cv2.flip(img, 0)
