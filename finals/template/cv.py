@@ -119,7 +119,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         final = cv2.addWeighted(dst, 0.001, dist, 1, 0.0)
         _, final = cv2.threshold(final, 0.37, 1.0, cv2.THRESH_BINARY)
 
-        if True:
+        if DEBUG_PIC:
             cv2.imshow("frame_cut", final)
             cv2.waitKey(0)
             cv2.destroyAllWindows()

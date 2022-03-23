@@ -62,7 +62,6 @@ class OperateRobot:
     def pick_object(self, obj_xyz: list[float], obj_orientation: float):
         obj_orientation = -obj_orientation
         xyz = cloud2robot(obj_xyz)
-        xyz = round_z_in_xyz(xyz)
         self.open_gripper()
         self.movel([xyz[0], xyz[1], xyz[2] + UPPER_MARGIN, 0, 0, obj_orientation])
         self.movel([xyz[0], xyz[1], xyz[2], 0, 0, obj_orientation])
@@ -71,7 +70,6 @@ class OperateRobot:
 
     def place_object(self, place_xyz: list[float], obj_orientation: float):
         xyz = place_xyz
-        xyz = round_z_in_xyz(xyz)
         self.close_gripper()
         self.movel([xyz[0], xyz[1], xyz[2] + UPPER_MARGIN, 0, 0, obj_orientation])
         self.movel([xyz[0], xyz[1], xyz[2], 0, 0, obj_orientation])

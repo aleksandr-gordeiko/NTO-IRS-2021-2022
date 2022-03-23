@@ -11,7 +11,7 @@ def print_if_debug(*msgs: str):
 
 
 def print_if_debug2(*msgs: str):
-    if DEBUG:
+    if DEBUG_GLEB:
         msgs = map(str, msgs)
         print(' '.join(msgs))
 
