@@ -16,13 +16,12 @@ UPPER_MARGIN = 0.1
 TABLE_Z = -0.68
 MIN_RZ = - math.pi / 2
 MAX_RZ = math.pi / 2
-RED_STACK_CENTER = [0.084, 0.209]
-BLUE_STACK_CENTER = [-0.0866, 0.214]
+RED_STACK_CENTER = [0.15049, 0.29783]
+BLUE_STACK_CENTER = [-0.01706, 0.29783]
 
 CAMERA_CSYS = Transform(Orientation(), Vector(-0.8880396596672806, -0.049594297988055605, 0.7440944822385092))
 CAMERA_TCP = Transform(Orientation([0.9142, 2.2072, -0.3787]), Vector(29.7, -29.7, 79.0) / 1000) \
              * Transform(Orientation(), Vector(0.0104, -0.0442, -0.07553909374))
-# 17.5
 
 GRIPPER_TCP = Transform(Orientation([1.2022, 2.9025, 0]), Vector(0, 0, 274 / 1000))
 ZERO_POSITION = [0, 0, 0, 0, 0, 0]
