@@ -57,8 +57,6 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     frame = cam.catch_frame()
     cam.save("test.ply")
     dots = o3d.io.read_point_cloud("test.ply")
-    red_points = []
-    blue_points = []
     center_meters = [0, 0]
     brick_data = []
     cur, dif_z = 0, 0
@@ -66,19 +64,22 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     min_y, max_y = MIN_Y, MAX_Y
     min_x, max_x = MIN_X, MAX_X
 
+    img = np.zeros((max_y - min_y + 1, max_x - min_x + 1, 3), np.uint8)
+    img_height = np.zeros((max_y - min_y + 1, max_x - min_x + 1))
+
     print_if_debug2("Start analyze")
 
     for i in dots.colors:
+        p = dots.points[cur]
+        y, x = fix_array(p[1] * 1000 - min_y, p[0] * 1000 - min_x, min_x, min_y, max_x, max_y)
 
         if (check_color(i[0], i[1], i[2])) and (int(dots.points[cur][2] * 1000) > MAIN_LIM_H):
-            red_points.append(
-                [int(dots.points[cur][0] * 1000), int(dots.points[cur][1] * 1000), int(dots.points[cur][2] * 1000),
-                 (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))])
+            img[y][x] = (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))
+        elif (check_color(i[2], i[0], i[1])) and (int(dots.points[cur][2] * 1000) > MAIN_LIM_H):
+            img[y][x] = (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))
 
-        if (check_color(i[2], i[0], i[1])) and (int(dots.points[cur][2] * 1000) > MAIN_LIM_H):
-            blue_points.append(
-                [int(dots.points[cur][0] * 1000), int(dots.points[cur][1] * 1000), int(dots.points[cur][2] * 1000),
-                 (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))])
+        img_height[y][x] = p[2] * 1000
+
         cur += 1
 
     # print_if_debug2("min_x, min_y:")
@@ -87,29 +88,6 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     # print_if_debug2("max_x, max_y:")
     # print_if_debug2(str(max_x))
     # print_if_debug2(str(max_y))
-
-    img = np.zeros((max_y - min_y + 1, max_x - min_x + 1, 3), np.uint8)
-    img_height = np.zeros((max_y - min_y + 1, max_x - min_x + 1))
-
-    for i in red_points:
-        y, x = fix_array(i[1] - min_y, i[0] - min_x, min_x, min_y, max_x, max_y)
-
-        if i[2] > LIM_H:
-            img[y][x] = i[3]
-        else:
-            img[y][x] = (50, 50, 50)
-
-        img_height[y][x] = i[2]
-
-    for i in blue_points:
-        y, x = fix_array(i[1] - min_y, i[0] - min_x, min_x, min_y, max_x, max_y)
-
-        if i[2] > LIM_H:
-            img[y][x] = i[3]
-        else:
-            img[y][x] = (50, 50, 50)
-
-        img_height[y][x] = i[2]
 
     img = cv2.flip(img, 0)
     img_height = cv2.flip(img_height, 0)
