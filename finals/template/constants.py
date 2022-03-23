@@ -8,7 +8,13 @@ def print_if_debug(*msgs: str):
         print(msgs)
 
 
+def print_if_debug2(*msgs: str):
+    if DEBUG_GLEB:
+        print(msgs)
+
+
 DEBUG = True
+DEBUG_GLEB = True
 
 IP = "172.31.1.25"
 BLOCK_MIN_HEIGHT = 0.02
