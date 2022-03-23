@@ -69,6 +69,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     print_if_debug2("Start analyze")
 
     for i in dots.colors:
+
         if (check_color(i[0], i[1], i[2])) and (int(dots.points[cur][2] * 1000) > MAIN_LIM_H):
             red_points.append(
                 [int(dots.points[cur][0] * 1000), int(dots.points[cur][1] * 1000), int(dots.points[cur][2] * 1000),
@@ -175,9 +176,9 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
             # cv2.drawContours(img, [box], -1, (255, 100, 0), 1)  # cur contours
             # center = (int(obj[0][0]), int(obj[0][1]))
             color_contour = img[int(cntr[2][0][1])][int(cntr[2][0][0])]
-            if color_contour[2] - 5 > color_contour[1] and color_contour[2] - 5 > color_contour[0]:
+            if check_color(color_contour[2], color_contour[1], color_contour[0]):
                 color_obj = 'red'
-            elif color_contour[0] - 5 > color_contour[1] and color_contour[0] - 5 > color_contour[2]:
+            elif check_color(color_contour[0], color_contour[1], color_contour[2]):
                 color_obj = 'blue'
             else:
                 color_obj = 'none'
