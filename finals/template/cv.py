@@ -48,11 +48,10 @@ def fix_array(y, x, min_x, min_y, max_x, max_y):
         x = max_x - min_x - 1
     if y >= max_y - min_y:
         y = max_y - min_y - 1
-    return y, x
+    return int(y), int(x)
 
 
 def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float):
-
     rob.move_to_camera_position()
     frame = cam.catch_frame()
     cam.save("test.ply")
@@ -187,10 +186,10 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
             print_if_debug2(str(new_brick.orientation))
 
             # if DEBUG_PIC:
-                # cv2.circle(img_range, (int(obj[0][0]), int(obj[0][1])), 2, (0, 255, 0))
-                # cv2.imshow("test", img_range)
-                # cv2.waitKey(0)
-                # cv2.destroyAllWindows()
+            # cv2.circle(img_range, (int(obj[0][0]), int(obj[0][1])), 2, (0, 255, 0))
+            # cv2.imshow("test", img_range)
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
 
     if previous_brick:
         old_z = previous_brick.center_z
