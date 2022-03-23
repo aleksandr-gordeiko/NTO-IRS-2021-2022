@@ -10,8 +10,8 @@ class OperateRobot:
         self.rob = urx.Robot(ip)
         self.red_height = 0
         self.blue_height = 0
-        self.rob.set_csys(cameratransform_base)
-        self.rob.set_tcp(gripper_tcp)
+        self.rob.set_csys(CAMERA_CSYS)
+        self.rob.set_tcp(GRIPPER_TCP)
 
     def movel(self, point: list[float]):
         if not TABLE_Z < point[2] <= 0:
@@ -37,9 +37,9 @@ class OperateRobot:
     # Higher level functions ######################################
 
     def move_to_camera_position(self):
-        self.rob.set_tcp(camera_tcp)
+        self.rob.set_tcp(CAMERA_TCP)
         self.movel(zero_position)
-        self.rob.set_tcp(gripper_tcp)
+        self.rob.set_tcp(GRIPPER_TCP)
 
     def pick_object(self, obj_xyz: list[float], obj_orientation: float, long=False):
         if long:

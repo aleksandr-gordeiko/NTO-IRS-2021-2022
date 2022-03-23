@@ -3,7 +3,6 @@ from math import sqrt
 import numpy as np
 from math3d import Transform, Orientation, Vector
 from numpy import sin, cos, matmul
-from numpy.linalg import det, inv
 
 
 def rotatex(alpha) -> np.ndarray:
@@ -43,17 +42,18 @@ def transform6dof(x, y, z, alpha, beta, gamma) -> np.ndarray:
 
 
 def main():
-    orv = Orientation.new_euler([0.9142, 2.2072, -0.3787], 'XYZ')
-    vec = Vector(29.7 / 1000 + 0.0175 / sqrt(2), -29.7 / 1000 + 0.0175 / sqrt(2), 79.0 / 1000)
-    tf = Transform(orv, vec)
-
-    matrix = transform6dof(29.7 / 1000 + 0.0175 / sqrt(2), -29.7 / 1000 + 0.0175 / sqrt(2), 79.0 / 1000, 0.9142, 2.2072,
-                           -0.3787)
+    orv = Orientation([0.9142, 2.2072, -0.3787])
+    vec = Vector(29.7 / 1000, -29.7 / 1000, 79.0 / 1000)
+    tf = Transform(Orientation([0.9142, 2.2072, -0.3787]), Vector(29.7 / 1000, -29.7 / 1000, 79.0 / 1000))
 
     print(tf.pose_vector)
 
-    print(matrix)
-    print(tf.get_matrix())
+    offset = Transform(Orientation(), Vector(0, 17.5/1000, 0))
+
+    tf = tf * offset
+
+
+    print(tf.pose_vector)
 
 
 if __name__ == "__main__":
