@@ -3,9 +3,9 @@ import numpy as np
 from math3d import Transform, Orientation, Vector
 
 
-def print_if_debug(msg: str):
+def print_if_debug(*msgs: str):
     if DEBUG:
-        print(msg)
+        print(msgs)
 
 
 DEBUG = True
@@ -30,4 +30,5 @@ HSV_MIN = np.array([0, 82, 0])
 HSV_MAX = np.array([139, 255, 136])
 MIN_Y, MAX_Y = -282, 269
 MIN_X, MAX_X = -490, 482
-LIM_H = -10800
+LIM_H = -999
+MAIN_LIM_H = -999

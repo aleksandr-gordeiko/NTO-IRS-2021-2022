@@ -61,18 +61,23 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     print_if_debug("Start analyze")
 
     for i in dots.colors:
-        if (check_color(i[0], i[1], i[2])) and (int(dots.points[cur][2] * 1000) > -700):
+        if (check_color(i[0], i[1], i[2])) and (int(dots.points[cur][2] * 1000) > MAIN_LIM_H):
             red_points.append(
                 [int(dots.points[cur][0] * 1000), int(dots.points[cur][1] * 1000), int(dots.points[cur][2] * 1000),
                  (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))])
 
-        if (check_color(i[2], i[0], i[1])) and (int(dots.points[cur][2] * 1000) > -700):
+        if (check_color(i[2], i[0], i[1])) and (int(dots.points[cur][2] * 1000) > MAIN_LIM_H):
             blue_points.append(
                 [int(dots.points[cur][0] * 1000), int(dots.points[cur][1] * 1000), int(dots.points[cur][2] * 1000),
                  (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))])
         cur += 1
 
-    print_if_debug("min_x, min_y:" + str(min_x, min_y)), print_if_debug("max_x, max_y:" + str(max_x, max_y))
+    print_if_debug("min_x, min_y:")
+    print_if_debug(str(min_x))
+    print_if_debug(str(min_y))
+    print_if_debug("max_x, max_y:")
+    print_if_debug(str(max_x))
+    print_if_debug(str(max_y))
 
     img = np.zeros((max_y - min_y + 1, max_x - min_x + 1, 3), np.uint8)
     img_height = np.zeros((max_y - min_y + 1, max_x - min_x + 1))
@@ -156,10 +161,10 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
             new_brick = Brick(color_obj, center_meters, center_z, angle, lb)
             brick_data.append(new_brick)
 
-            print_if_debug("Color " + str(new_brick.color))
-            print_if_debug("X Y " + str(new_brick.center_xy))
-            print_if_debug("Z " + str(new_brick.center_z))
-            print_if_debug("angle " + str(new_brick.orientation))
+            print_if_debug("Color, XYZ")
+            print_if_debug(str(new_brick.color), str(new_brick.center_xy), str(new_brick.center_z))
+            print_if_debug("Angle")
+            print_if_debug(str(new_brick.orientation))
 
             cv2.circle(img_range, (obj[0][0], obj[0][1]), 2, (0, 255, 0))
             cv2.imshow("test", img_range)
