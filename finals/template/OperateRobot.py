@@ -15,7 +15,7 @@ class OperateRobot:
         self.rob.set_tcp(GRIPPER_TCP)
 
     def movel(self, point: list[float]):
-        if point[2] > 0:
+        if point[2] > 0:  # not -0.5 < point[1] < 0.5 or not -0.5 < point[2] < 0.5 or
             raise ValueError("Point unreachable: {}".format(point))
         if point[2] < TABLE_Z:
             point[2] = TABLE_Z
@@ -55,6 +55,7 @@ class OperateRobot:
         self.rob.set_tcp(GRIPPER_TCP)
 
     def pick_object(self, obj_xyz: list[float], obj_orientation: float):
+        obj_orientation = -obj_orientation
         xyz = cloud2robot(obj_xyz)
         self.open_gripper()
         self.movel([xyz[0], xyz[1], xyz[2] + UPPER_MARGIN, 0, 0, obj_orientation])

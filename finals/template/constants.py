@@ -14,8 +14,8 @@ IP = "172.31.1.25"
 BLOCK_MIN_HEIGHT = 0.02
 UPPER_MARGIN = 0.1
 TABLE_Z = -0.68
-MIN_RZ = 0
-MAX_RZ = 2 * math.pi
+MIN_RZ = - math.pi / 2
+MAX_RZ = math.pi / 2
 RED_STACK_CENTER = [0.084, 0.209]
 BLUE_STACK_CENTER = [-0.0866, 0.214]
 
