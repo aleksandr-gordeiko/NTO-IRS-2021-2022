@@ -1,4 +1,5 @@
 import cv2 as cv
+import numpy
 import numpy as np
 import cv2
 import open3d as o3d
@@ -8,9 +9,10 @@ import copy
 
 def fill_gaps(mat: cv.mat_wrapper, n_iterations=20) -> cv.mat_wrapper:
     res = mat.copy()
+    n_channels = numpy.shape(mat)[2]
     for i in range(n_iterations):
         cv.copyTo(cv.dilate(res, cv.getStructuringElement(cv.MORPH_ELLIPSE, (3, 3)), iterations=2),
-                  dst=res, mask=cv.inRange(res, np.array([0, 0, 0]), np.array([1, 1, 1])))
+                  dst=res, mask=cv.inRange(res, np.zeros(n_channels), np.ones(n_channels) * .1))
     return res
 
 
