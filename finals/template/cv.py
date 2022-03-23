@@ -34,20 +34,27 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     print("Start analyze")
 
     for i in dots.colors:
-
+        if min_y > int(dots.points[cur][1] * 1000):
+            min_y = int(dots.points[cur][1] * 1000)
+        elif max_y < int(dots.points[cur][1] * 1000):
+            max_y = int(dots.points[cur][1] * 1000)
+        if min_x > int(dots.points[cur][0] * 1000):
+            min_x = int(dots.points[cur][0] * 1000)
+        elif max_x < int(dots.points[cur][0] * 1000):
+            max_x = int(dots.points[cur][0] * 1000)
         if (int(i[0] * 255) - 5. > int(i[1] * 255)) and (int(i[0] * 255) - 10. > int(i[2] * 255)) \
-                and (int(dots.points[cur][2] * 1000) > -630):
+                and (int(dots.points[cur][2] * 1000) > -700):
             red_points.append(
                 [int(dots.points[cur][0] * 1000), int(dots.points[cur][1] * 1000), int(dots.points[cur][2] * 1000),
                  (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))])
 
         if (int(i[2] * 255) - 5. > int(i[0] * 255)) and (int(i[2] * 255) - 10. > int(i[1] * 255)) \
-                and (int(dots.points[cur][2] * 1000) > -630):
+                and (int(dots.points[cur][2] * 1000) > -700):
             blue_points.append(
                 [int(dots.points[cur][0] * 1000), int(dots.points[cur][1] * 1000), int(dots.points[cur][2] * 1000),
                  (int(i[2] * 255), int(i[1] * 255), int(i[0] * 255))])
         cur += 1
-
+        min_x = min(min_x, )
     print(min_x, min_y, max_x, max_y)
     img = np.zeros((max_y - min_y + 1, max_x - min_x + 1, 3), np.uint8)
     img_height = np.zeros((max_y - min_y + 1, max_x - min_x + 1))
@@ -66,12 +73,12 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     img = cv2.flip(img, 0)
     img_height = cv2.flip(img_height, 0)
     # img_copy = copy.deepcopy(img)
-    # cv2.imshow("test", img)
-    # cv2.waitKey(7000)
+    # cv2.imshow("test img", img)
+    # cv2.waitKey(7000)'''
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img_range = cv2.inRange(img_hsv, HSV_MIN, HSV_MAX)
-    cv2.imshow("test", img_range)
-    cv2.waitKey(7000)
+    # cv2.imshow("test", img_range)
+    # cv2.waitKey(7000)
 
     contours, hierarchy = cv2.findContours(img_range, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 

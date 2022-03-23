@@ -1,10 +1,9 @@
+from time import sleep
 import urx
-import math
 from urx import RobotException
 
-from coordinates import *
-from time import sleep
 from constants import *
+from coordinates import *
 
 
 class OperateRobot:
