@@ -21,7 +21,8 @@ BLUE_STACK_CENTER = [-0.090, 0.15]
 
 CAMERA_CSYS = Transform(Orientation(), Vector(-0.8880396596672806, -0.049594297988055605, 0.7440944822385092))
 CAMERA_TCP = Transform(Orientation([0.9142, 2.2072, -0.3787]), Vector(29.7, -29.7, 79.0) / 1000) \
-             * Transform(Orientation(), Vector(0, 17.5, 4.2) / 1000)
+             * Transform(Orientation(), Vector(0.0104, -0.0442, -0.07553909374))
+# 17.5
 
 GRIPPER_TCP = Transform(Orientation([1.2022, 2.9025, 0]), Vector(0, 0, 274 / 1000))
 ZERO_POSITION = [0, 0, 0, 0, 0, 0]
