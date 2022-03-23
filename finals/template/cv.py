@@ -38,7 +38,7 @@ def find_min_max(min_x, min_y, max_x, max_y, i, cur):
 
 
 def check_color(main_color, color1, color2):
-    if ((main_color * 255) - 5. > color1 * 255) and ((main_color * 255) - 10. > color2 * 255):
+    if ((main_color * 255) - FILTER_COLOR > color1 * 255) and ((main_color * 255) - FILTER_COLOR > color2 * 255):
         return True
     return False
 
@@ -133,7 +133,6 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
 
     if EXPERIMENTAL:
         img_test = cv2.Canny(img, 0, 255, None, 3, 0)
-        cv2.imshow("frame_test", img_test)
         dst = cv2.addWeighted(img_range, 1, img_test, -1, 0.0)
         dist = cv2.distanceTransform(dst, cv2.DIST_L2, 3)
         cv2.normalize(dist, dist, 0, 1.0, cv2.NORM_MINMAX)
