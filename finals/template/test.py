@@ -3,8 +3,8 @@ from OperateCamera import OperateCamera
 from cv import analyze_image
 
 def main():
-    cam = OperateCamera()
-    '''robot = OperateRobot("172.31.1.25", [0, 0, 0, 0, 0, 0], [[0, 0], [0, 0]], [[0, 0], [0, 0]], [[0, 0], [0, 0]])
+    '''cam = OperateCamera()
+    robot = OperateRobot("172.31.1.25", [0, 0, 0, 0, 0, 0], [[0, 0], [0, 0]], [[0, 0], [0, 0]], [[0, 0], [0, 0]])
     
 
     pos = robot.getl()

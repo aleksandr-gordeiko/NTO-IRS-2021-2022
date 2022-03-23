@@ -38,13 +38,12 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
 
     print_if_debug2("Start analyze")
     img, img_height = convert_ply("PLY\\data_new_set2.ply", MIN_X, MIN_Y, MAX_X, MAX_Y)
-    create_frame(img)
 
     img = cv2.flip(img, 0)
     img_height = cv2.flip(img_height, 0)
 
     img = fill_gaps(img)
-
+    create_frame(img)
     # img_copy = copy.deepcopy(img)
 
     if DEBUG_PIC:
@@ -110,10 +109,8 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
             new_brick = Brick(color_obj, copy.deepcopy(center_meters), center_z, angle, lb)
             brick_data.append(new_brick)
 
-            print_if_debug2("Color, XYZ")
-            print_if_debug2(str(new_brick.color), str(new_brick.center_xy), str(new_brick.center_z))
-            print_if_debug2("Angle")
-            print_if_debug2(str(new_brick.orientation))
+            print_if_debug2("Color", str(new_brick.color), "XYZ", str(new_brick.center_xy), str(new_brick.center_z))
+            print_if_debug2("Angle", str(new_brick.orientation))
 
             # if DEBUG_PIC:
             # cv2.circle(img_range, (int(obj[0][0]), int(obj[0][1])), 2, (0, 255, 0))

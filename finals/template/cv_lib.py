@@ -93,5 +93,9 @@ def slip_obj(src, bin_src):
 
 
 def create_frame(src, x1=450, x2=850):
-    cv2.rectangle(src, (0, 0), (x1, 1000), (0, 0, 0), -1)
-    cv2.rectangle(src, (x2, 0), (1000, 1000), (0, 0, 0), -1)
+    mask = np.zeros((MAX_Y - MIN_Y + 1, MAX_X - MIN_X + 1), np.uint8)
+    cv2.rectangle(mask, (450, 100), (900, 470), 255, -1)
+    final = cv2.bitwise_and(src, src, mask=mask)
+    cv2.imshow("jdd", final)
+    cv2.waitKey(0)
+    # cv2.rectangle(src, (x2, 0), (1000, 1000), (0, 0, 0), -1)
