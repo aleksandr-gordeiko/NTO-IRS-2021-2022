@@ -10,6 +10,8 @@ def print_if_debug(*msgs: str):
         print(' '.join(msgs))
 
 
+# JUST
+
 DEBUG = True
 DEBUG_GLEB = False
 DEBUG_PIC = False
