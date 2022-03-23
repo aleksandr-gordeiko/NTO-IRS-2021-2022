@@ -46,8 +46,8 @@ ZERO_POSITION = [0, 0, 0, 0, 0, 0]
 
 HSV_MIN = np.array([0, 82, 0])
 HSV_MAX = np.array([139, 255, 136])
-MIN_Y, MAX_Y = -282, 269
-MIN_X, MAX_X = -490, 482
+'''MIN_Y, MAX_Y = -282, 269
+MIN_X, MAX_X = -490, 482'''
 LIM_H = -999
 MAIN_LIM_H = -999
 THRESHOLD_MIN = 0.37
