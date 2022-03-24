@@ -2,6 +2,7 @@
 # import math
 # import cv2
 # import numpy as np
+from typing import Optional
 
 from OperateCamera import OperateCamera
 from OperateRobot import OperateRobot
@@ -25,7 +26,8 @@ class Brick:
         return self.__repr__()
 
 
-def analyze_image(cam: OperateCamera, rob: OperateRobot) -> (list[Brick], float, float):
+def analyze_image(
+        cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float, float):
     rob.move_to_camera_position()
     cam.catch_frame()
     cam.save("test.ply")
@@ -121,7 +123,17 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot) -> (list[Brick], float,
         cv2.imshow("test", img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-    print(len(brick_data))
+
+    if previous_brick:
+        old_z = previous_brick.center_z
+        brick_pos = previous_brick.center_xy
+        new_z = (img_height[int(brick_pos[0] * -1000 - min_y), int(brick_pos[1] * -1000 - min_x)] / 1000)  # swap axes
+        if new_z == 0:
+            new_z = TABLE_Z
+        dif_z = new_z - old_z
+        print(new_z, old_z)
+    else:
+        dif_z = 0
     red_zone_h = img_height[int((0.09*1000-min_x))][int((-0.204*1000-min_y))] / 1000
     blue_zone_h = img_height[int((-0.07*1000-min_x))][int((-0.204*1000-min_y))] / 1000
-    return brick_data, red_zone_h, blue_zone_h
+    return brick_data, red_zone_h, blue_zone_h, dif_z

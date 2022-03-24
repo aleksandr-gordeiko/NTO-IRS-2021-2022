@@ -73,11 +73,11 @@ class OperateRobot:
         self.open_gripper()
         self.movel([xyz[0], xyz[1], xyz[2] + UPPER_MARGIN, 0, 0, obj_orientation])
 
-    def stack_object(self, red_stack_height: float, blue_stack_height: float, stack_color: str):
+    def stack_object(self, red_stack_height: float, blue_stack_height: float, brick_height: float, stack_color: str):
         if stack_color == 'red':
-            stack_top = [RED_STACK_CENTER[0], RED_STACK_CENTER[1], red_stack_height]
+            stack_top = [RED_STACK_CENTER[0], RED_STACK_CENTER[1], red_stack_height + brick_height]
             print_if_debug("Stacking red object")
         else:
-            stack_top = [BLUE_STACK_CENTER[0], BLUE_STACK_CENTER[1], blue_stack_height]
+            stack_top = [BLUE_STACK_CENTER[0], BLUE_STACK_CENTER[1], blue_stack_height + brick_height]
             print_if_debug("Stacking blue object")
         self.place_object(stack_top, PLACEMENT_ANGLE)
