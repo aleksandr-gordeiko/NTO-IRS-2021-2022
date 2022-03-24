@@ -96,20 +96,17 @@ def analyze_image(
 
             edge1 = np.int0((box[1][0] - box[0][0], box[1][1] - box[0][1]))
             edge2 = np.int0((box[2][0] - box[1][0], box[2][1] - box[1][1]))
-            usedEdge = edge1
+            used_edge = edge1
             if cv.norm(edge2) > cv.norm(edge1):
-                usedEdge = edge2
-            reference = (1, 0)  # горизонтальный вектор, задающий горизонт
-            angle = 180.0 / math.pi * math.acos(
-                (reference[0] * usedEdge[0] + reference[1] * usedEdge[1]) / (cv.norm(reference) * cv.norm(usedEdge)))
-            angle = angle * (np.pi / 180.)  # RAD
+                used_edge = edge2
+            angle = math.atan2(used_edge[1], used_edge[0])
 
             p = 2
             while center_z == 0:
                 center_z = img_height[int(cntr[p][0][1])][int(cntr[p][0][0])]
                 p += 1
 
-            long_edge = cv2.norm(usedEdge)
+            long_edge = cv2.norm(used_edge)
             if long_edge > 70:
                 lb = True
             else:
