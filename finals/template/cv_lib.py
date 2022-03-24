@@ -201,7 +201,6 @@ def check_stack(src, mat_h, borders):
 
         color_contour = src[round(obj[0][1])][round(obj[0][0])]
         if check_color(color_contour[2], color_contour[1], color_contour[0]):
-            print("RED")
             max_red_z = max(max_red_z, mat_h[round(obj[0][1])][round(obj[0][0])] / 1000)
             mem_red = (round(obj[0][0]), round(obj[0][1]))
         elif check_color(color_contour[0], color_contour[1], color_contour[2]):
@@ -211,7 +210,8 @@ def check_stack(src, mat_h, borders):
         cv2.circle(src, mem_blue, 2, (255, 255, 255), -1)
     if max_red_z != TABLE_Z:
         cv2.circle(src, mem_red, 2, (255, 0, 0), -1)
-    print(len(cntrs))
-    cv2.imshow("src", src)
-    cv2.waitKey(0)'''
+    print(len(cntrs))'''
+    # print(max_red_z, max_blue_z)
+    # cv2.imshow("src", src)
+    # cv2.waitKey(0)
     return max_red_z, max_blue_z
