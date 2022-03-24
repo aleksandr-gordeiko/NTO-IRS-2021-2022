@@ -56,7 +56,11 @@ class OperateRobot:
         self.movel(ZERO_POSITION)
         self.rob.set_tcp(GRIPPER_TCP)
 
-    def pick_object(self, obj_xyz: list[float], obj_orientation: float):
+    def pick_object(self, obj_xyz: list[float], obj_orientation: float, long: bool):
+        if long:
+            obj_orientation += math.pi / 2
+        else:
+            obj_orientation = -obj_orientation
         obj_orientation = -obj_orientation
         xyz = cloud2robot(obj_xyz)
         self.open_gripper()
@@ -65,7 +69,7 @@ class OperateRobot:
         self.close_gripper()
         self.movel([xyz[0], xyz[1], xyz[2] + UPPER_MARGIN, 0, 0, obj_orientation])
 
-    def place_object(self, place_xyz: list[float], obj_orientation: float):
+    def place_object(self, place_xyz: list[float], obj_orientation: float, long: bool):
         xyz = place_xyz
         self.close_gripper()
         self.movel([xyz[0], xyz[1], xyz[2] + UPPER_MARGIN, 0, 0, obj_orientation])
@@ -73,11 +77,11 @@ class OperateRobot:
         self.open_gripper()
         self.movel([xyz[0], xyz[1], xyz[2] + UPPER_MARGIN, 0, 0, obj_orientation])
 
-    def stack_object(self, red_stack_height: float, blue_stack_height: float, brick_height: float, stack_color: str):
+    def stack_object(self, red_stack_height: float, blue_stack_height: float, brick_height: float, stack_color: str, long: bool):
         if stack_color == 'red':
             stack_top = [RED_STACK_CENTER[0], RED_STACK_CENTER[1], red_stack_height + brick_height]
             print_if_debug("Stacking red object")
         else:
             stack_top = [BLUE_STACK_CENTER[0], BLUE_STACK_CENTER[1], blue_stack_height + brick_height]
             print_if_debug("Stacking blue object")
-        self.place_object(stack_top, PLACEMENT_ANGLE)
+        self.place_object(stack_top, PLACEMENT_ANGLE, long)

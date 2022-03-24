@@ -184,12 +184,12 @@ def create_frame(src, borders, xy=(450, 100), xy2=(900, 470)):
     return copy.deepcopy(final)
 
 
-def check_stack(src, mat_h, min_x, min_y):
+def check_stack(src, mat_h, borders):
 
     max_red_z = -1.
     max_blue_z = -1.
 
-    src = create_frame(src, (70, 70), (450, 470))
+    src = create_frame(src, borders, (70, 70), (450, 470))
     hsv_src = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
     bin_src = cv2.inRange(hsv_src, HSV_MIN, HSV_MAX)
     cntrs = find_contours(bin_src)

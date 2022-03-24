@@ -19,8 +19,8 @@ class Brick:
         self.color = color
 
     def __repr__(self):
-        return "Center: {};{};{} Orientation: {} Color: {}" \
-            .format(self.center_xy[0], self.center_xy[1], self.center_z, self.orientation, self.color)
+        return "Center: {};{};{} Orientation: {} Color: {} Long: {}" \
+            .format(self.center_xy[0], self.center_xy[1], self.center_z, self.orientation, self.color, self.long)
 
     def __str__(self):
         return self.__repr__()
@@ -28,17 +28,17 @@ class Brick:
 
 def analyze_image(
     cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float, float):
-    rob.move_to_camera_position()
+    """rob.move_to_camera_position()
     cam.catch_frame()
-    cam.save("test.ply")
+    cam.save("test.ply")"""
     center_meters = [0, 0]
     brick_data = []
 
     print_if_debug2("Start analyze")
-    img, img_height, borders = convert_ply2("test.ply")
+    img, img_height, borders = convert_ply2("PLY/data_new_set_blocks_2.ply")
     min_x, max_x, min_y, max_y, min_z, max_z = borders
 
-    red_zone_h, blue_zone_h = check_stack(img, img_height, min_x, min_y)
+    red_zone_h, blue_zone_h = check_stack(img, img_height, borders)
 
     # img = cv2.flip(img, 0)
     # img_height = cv2.flip(img_height, 0)
@@ -110,7 +110,7 @@ def analyze_image(
                 center_z = img_height[int(cntr[p][0][1])][int(cntr[p][0][0])]
                 p += 1
 
-            long_edge = obj[1][0]
+            long_edge = cv2.norm(usedEdge)
             if long_edge > 70:
                 lb = True
             else:
