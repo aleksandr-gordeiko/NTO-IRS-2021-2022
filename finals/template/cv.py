@@ -1,13 +1,11 @@
-import copy
-from typing import Optional
-
+# import copy
 # import math
-import cv2
-import numpy as np
+# import cv2
+# import numpy as np
 
 from OperateCamera import OperateCamera
 from OperateRobot import OperateRobot
-from constants import *
+# from constants import *
 from cv_lib import *
 
 
@@ -27,16 +25,15 @@ class Brick:
         return self.__repr__()
 
 
-def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float):
-    '''rob.move_to_camera_position()
-    frame = cam.catch_frame()
-    cam.save("test.ply")'''
+def analyze_image(cam: OperateCamera, rob: OperateRobot) -> (list[Brick], float, float):
+    rob.move_to_camera_position()
+    cam.catch_frame()
+    cam.save("test.ply")
     center_meters = [0, 0]
     brick_data = []
-    dif_z = 0
 
     print_if_debug2("Start analyze")
-    img, img_height, borders = convert_ply2("PLY\\data_new_set2.ply")
+    img, img_height, borders = convert_ply2("test.ply")
     min_x, max_x, min_y, max_y, min_z, max_z = borders
 
     img = cv2.flip(img, 0)
@@ -125,6 +122,6 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
         cv2.waitKey(0)
         cv2.destroyAllWindows()
     print(len(brick_data))
-    red_zone_h = img_height[int((0.09*1000-min_x))][int((-0.204*1000-min_y))]
-    blue_zone_h = img_height[int((-0.07*1000-min_x))][int((-0.204*1000-min_y))]
+    red_zone_h = img_height[int((0.09*1000-min_x))][int((-0.204*1000-min_y))] / 1000
+    blue_zone_h = img_height[int((-0.07*1000-min_x))][int((-0.204*1000-min_y))] / 1000
     return brick_data, red_zone_h, blue_zone_h

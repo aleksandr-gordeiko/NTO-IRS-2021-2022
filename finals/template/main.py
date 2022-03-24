@@ -8,7 +8,7 @@ from constants import *
 
 
 def main():
-    """while True:
+    while True:
         try:
             print_if_debug("Initializing hardware...")
             rob = OperateRobot(IP)
@@ -17,18 +17,19 @@ def main():
             print_if_debug("Initializing hardware done")
             break
         except socket.timeout or TimeoutException:
-            print_if_debug("Robot connection refused")"""
+            print_if_debug("Robot connection refused")
 
     while True:
         try:
-            bricks, previous_brick_height = analyze_image(cam=None, rob=None, previous_brick=None)
+            bricks, red_stack_height, blue_stack_height = analyze_image(cam, rob)
             while len(bricks) != 0:
                 brick = max(bricks, key=attrgetter('center_z'))
                 print_if_debug("Selected brick:\n", brick)
                 print_if_debug("All bricks:\n", '\n '.join(map(str, bricks)))
-                rob.pick_object([brick.center_xy[0], brick.center_xy[1], brick.center_z - BLOCK_MIN_HEIGHT], brick.orientation)
-                bricks, previous_brick_height = analyze_image(cam, rob, brick)
-                rob.stack_object(previous_brick_height, brick.color)
+                rob.pick_object(
+                    [brick.center_xy[0], brick.center_xy[1], brick.center_z - BLOCK_MIN_HEIGHT], brick.orientation)
+                bricks, red_stack_height, blue_stack_height = analyze_image(cam, rob)
+                rob.stack_object(red_stack_height, blue_stack_height, brick.color)
             rob.close()
             break
         except ValueError:

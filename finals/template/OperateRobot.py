@@ -6,22 +6,19 @@ from constants import *
 from coordinates import *
 
 
-def round_z_in_xyz(xyz: list[float]):
-    xyz[2] = ((xyz[2] - TABLE_Z) // HEIGHT_STEP) * HEIGHT_STEP + TABLE_Z
-    return xyz
-
-
 class OperateRobot:
     def __init__(self, ip: str):
         self.rob = urx.Robot(ip)
-        self.red_height = 0
-        self.blue_height = 0
         self.rob.set_csys(CAMERA_CSYS)
         self.rob.set_tcp(GRIPPER_TCP)
 
     def movel(self, point: list[float]):
-        if point[2] > 0:  # not (-0.5 < point[1] < 0.5) or not (-0.5 < point[2] < 0.5) or
-            raise ValueError("Point unreachable: {}".format(point))
+        if point[0] < -0.5 or point[0] > 0.5:
+            raise ValueError("Point unreachable (X): {}".format(point))
+        if point[1] < -0.5 or point[1] > 0.5:
+            raise ValueError("Point unreachable (Y): {}".format(point))
+        if point[2] > 0:
+            raise ValueError("Point unreachable (Z): {}".format(point))
         if point[2] < TABLE_Z:
             point[2] = TABLE_Z
         while point[5] < MIN_RZ:
@@ -76,13 +73,11 @@ class OperateRobot:
         self.open_gripper()
         self.movel([xyz[0], xyz[1], xyz[2] + UPPER_MARGIN, 0, 0, obj_orientation])
 
-    def stack_object(self, obj_height: float, stack_color: str):
+    def stack_object(self, red_stack_height: float, blue_stack_height: float, stack_color: str):
         if stack_color == 'red':
-            stack_top = [RED_STACK_CENTER[0], RED_STACK_CENTER[1], TABLE_Z + self.red_height]
-            self.red_height += obj_height
+            stack_top = [RED_STACK_CENTER[0], RED_STACK_CENTER[1], red_stack_height]
             print_if_debug("Stacking red object")
         else:
-            stack_top = [BLUE_STACK_CENTER[0], BLUE_STACK_CENTER[1], TABLE_Z + self.blue_height]
-            self.blue_height += obj_height
+            stack_top = [BLUE_STACK_CENTER[0], BLUE_STACK_CENTER[1], blue_stack_height]
             print_if_debug("Stacking blue object")
         self.place_object(stack_top, PLACEMENT_ANGLE)
