@@ -38,6 +38,8 @@ def analyze_image(
     img, img_height, borders = convert_ply2("test.ply")
     min_x, max_x, min_y, max_y, min_z, max_z = borders
 
+    red_zone_h, blue_zone_h = check_stack(img, img_height, min_x, min_y)
+
     # img = cv2.flip(img, 0)
     # img_height = cv2.flip(img_height, 0)
 
@@ -145,6 +147,6 @@ def analyze_image(
     else:
         dif_z = 0
 
-    red_zone_h = img_height[int((0.09*1000-min_x))][int((-0.204*1000-min_y))] / 1000
-    blue_zone_h = img_height[int((-0.07*1000-min_x))][int((-0.204*1000-min_y))] / 1000
+    '''red_zone_h = img_height[int((0.09*1000-min_x))][int((-0.204*1000-min_y))] / 1000
+    blue_zone_h = img_height[int((-0.07*1000-min_x))][int((-0.204*1000-min_y))] / 1000'''
     return brick_data, red_zone_h, blue_zone_h, dif_z

@@ -172,13 +172,46 @@ def slip_obj(src, bin_src):
     return copy.deepcopy(final.astype("uint8"))
 
 
-def create_frame(src, borders, x1=450, x2=850):
+def create_frame(src, borders, xy=(450, 100), xy2=(900, 470)):
     min_x, max_x, min_y, max_y, min_z, max_z = borders
     x_height, y_height = max_x - min_x + 1, max_y - min_y + 1
     mask = np.zeros((x_height, y_height), np.uint8)
-    cv2.rectangle(mask, (450, 100), (900, 470), 255, -1)
+    cv2.rectangle(mask, xy, xy2, 255, -1)
     final = cv2.bitwise_and(src, src, mask=mask)
     # cv2.imshow("jdd", final)
     # cv2.waitKey(0)
     # cv2.rectangle(src, (x2, 0), (1000, 1000), (0, 0, 0), -1)
     return copy.deepcopy(final)
+
+
+def check_stack(src, mat_h, min_x, min_y):
+
+    max_red_z = -1.
+    max_blue_z = -1.
+
+    src = create_frame(src, (70, 70), (450, 470))
+    hsv_src = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+    bin_src = cv2.inRange(hsv_src, HSV_MIN, HSV_MAX)
+    cntrs = find_contours(bin_src)
+    for cntr in cntrs:
+        obj = cv2.minAreaRect(cntr)
+        box = cv2.boxPoints(obj)
+        box = np.int0(box)
+        cv2.drawContours(src, [box], -1, (255, 255, 255))  # all contours
+
+        color_contour = src[round(obj[0][1])][round(obj[0][0])]
+        if check_color(color_contour[2], color_contour[1], color_contour[0]):
+            print("RED")
+            max_red_z = max(max_red_z, mat_h[round(obj[0][1])][round(obj[0][0])] / 1000)
+            mem_red = (round(obj[0][0]), round(obj[0][1]))
+        elif check_color(color_contour[0], color_contour[1], color_contour[2]):
+            max_blue_z = max(max_red_z, mat_h[round(obj[0][1])][round(obj[0][0])] / 1000)
+            mem_blue = (round(obj[0][0]), round(obj[0][1]))
+    '''if max_blue_z != TABLE_Z:
+        cv2.circle(src, mem_blue, 2, (255, 255, 255), -1)
+    if max_red_z != TABLE_Z:
+        cv2.circle(src, mem_red, 2, (255, 0, 0), -1)
+    print(len(cntrs))
+    cv2.imshow("src", src)
+    cv2.waitKey(0)'''
+    return max_red_z, max_blue_z
