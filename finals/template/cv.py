@@ -27,7 +27,7 @@ class Brick:
 
 
 def analyze_image(
-        cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float, float):
+    cam: OperateCamera, rob: OperateRobot, previous_brick: Optional[Brick]) -> (list[Brick], float, float):
     rob.move_to_camera_position()
     cam.catch_frame()
     cam.save("test.ply")
@@ -91,6 +91,7 @@ def analyze_image(
             center_meters[1] = (round(((obj[0][0] + min_y) / 1000), 4)) * -1  # X\Y
             center_meters[0] = (round(((obj[0][1] + min_x) / 1000), 4)) * -1  # Y\X
             center_z = img_height[round(obj[0][1])][round(obj[0][0])] / 1000  # Z
+            angle = obj[2] * (np.pi / 180.)  # RAD
 
             p = 2
             while center_z == 0:
@@ -102,7 +103,6 @@ def analyze_image(
                 lb = True
             else:
                 lb = False
-            angle = obj[2] * (np.pi / 180.)  # RAD
 
             new_brick = Brick(color_obj, copy.deepcopy(center_meters), center_z, angle, lb)
             brick_data.append(new_brick)
@@ -127,13 +127,14 @@ def analyze_image(
     if previous_brick:
         old_z = previous_brick.center_z
         brick_pos = previous_brick.center_xy
-        new_z = (img_height[int(brick_pos[0] * -1000 - min_y), int(brick_pos[1] * -1000 - min_x)] / 1000)  # swap axes
+        new_z = (img_height[int(brick_pos[0] * -1000 - min_x), int(brick_pos[1] * -1000 - min_y)] / 1000)  # swap axes
         if new_z == 0:
             new_z = TABLE_Z
         dif_z = new_z - old_z
-        print(new_z, old_z)
+        print_if_debug2("new, old, dif z", str(new_z), str(old_z), str(dif_z))
     else:
         dif_z = 0
+
     red_zone_h = img_height[int((0.09*1000-min_x))][int((-0.204*1000-min_y))] / 1000
     blue_zone_h = img_height[int((-0.07*1000-min_x))][int((-0.204*1000-min_y))] / 1000
     return brick_data, red_zone_h, blue_zone_h, dif_z
