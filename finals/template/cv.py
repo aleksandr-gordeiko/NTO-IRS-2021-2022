@@ -43,7 +43,7 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
     img_height = cv2.flip(img_height, 0)
 
     img = fill_gaps(img)
-    create_frame(img, borders)
+    img = create_frame(img, borders)
     # img_copy = copy.deepcopy(img)
 
     if DEBUG_PIC:
@@ -72,14 +72,14 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
 
     for cntr in contours_plus:
         obj = cv2.minAreaRect(cntr)
-        # box = cv2.boxPoints(obj)
-        # box = np.int0(box)
+        box = cv2.boxPoints(obj)
+        box = np.int0(box)
 
         print_if_debug2("OBJ:", str(obj))
 
         area = int(obj[1][0] * obj[1][1])
         if area > 100:
-            # cv2.drawContours(img, [box], -1, (255, 100, 0), 1)  # cur contours
+            cv2.drawContours(img, [box], -1, (255, 100, 0), 1)  # draw contours
             # center = (int(obj[0][0]), int(obj[0][1]))
             color_contour = img[int(cntr[2][0][1])][int(cntr[2][0][0])]
             if check_color(color_contour[2], color_contour[1], color_contour[0]):
@@ -103,7 +103,6 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
                 lb = True
             else:
                 lb = False
-
             angle = obj[2] * (np.pi / 180.)  # RAD
 
             new_brick = Brick(color_obj, copy.deepcopy(center_meters), center_z, angle, lb)
@@ -112,21 +111,20 @@ def analyze_image(cam: OperateCamera, rob: OperateRobot, previous_brick: Optiona
             print_if_debug2("Color", str(new_brick.color), "XYZ", str(new_brick.center_xy), str(new_brick.center_z))
             print_if_debug2("Angle", str(new_brick.orientation))
 
-            # if DEBUG_PIC:
-            # cv2.circle(img_range, (int(obj[0][0]), int(obj[0][1])), 2, (0, 255, 0))
-            # cv2.imshow("test", img_range)
-            # cv2.waitKey(0)
-            # cv2.destroyAllWindows()
+            '''if DEBUG_PIC:
+                print((int((-0.204-min_y)*1000), int((0.09-min_x)*1000)))
+                cv2.circle(img, (int((-0.204*1000-min_y)), int((0.09*1000-min_x))), 50, (0, 0, 255), -1)
+                cv2.circle(img, (int((-0.204*1000-min_y)), int((-0.07*1000-min_x))), 50, (255, 0, 255), -1)
+                cv2.imshow("test", img)
+                print(img[int((0.09*1000-min_x))][int((-0.204*1000-min_y))])
+                cv2.waitKey(0)
+                cv2.destroyAllWindows()'''
 
-    if previous_brick:
-        old_z = previous_brick.center_z
-        brick_pos = previous_brick.center_xy
-        new_z = (img_height[int(brick_pos[0] * -1000 - min_y), int(brick_pos[1] * -1000 - min_x)] / 1000)  # swap axes
-        if new_z == 0:
-            new_z = TABLE_Z
-        dif_z = new_z - old_z
-        print(new_z, old_z)
-    else:
-        dif_z = 0
-
-    return brick_data, dif_z
+    if DEBUG_PIC:
+        cv2.imshow("test", img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+    print(len(brick_data))
+    red_zone_h = img_height[int((0.09*1000-min_x))][int((-0.204*1000-min_y))]
+    blue_zone_h = img_height[int((-0.07*1000-min_x))][int((-0.204*1000-min_y))]
+    return brick_data, red_zone_h, blue_zone_h

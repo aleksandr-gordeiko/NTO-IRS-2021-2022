@@ -45,7 +45,7 @@ GRIPPER_TCP = Transform(Orientation([1.2022, 2.9025, 0]), Vector(0, 0, 274 / 100
 ZERO_POSITION = [0, 0, 0, 0, 0, 0]
 
 HSV_MIN = np.array([0, 82, 0])
-HSV_MAX = np.array([139, 255, 136])
+HSV_MAX = np.array([139, 255, 255])
 '''MIN_Y, MAX_Y = -282, 269
 MIN_X, MAX_X = -490, 482'''
 LIM_H = -999
