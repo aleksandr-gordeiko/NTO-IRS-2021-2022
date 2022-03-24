@@ -38,8 +38,8 @@ def analyze_image(
     img, img_height, borders = convert_ply2("test.ply")
     min_x, max_x, min_y, max_y, min_z, max_z = borders
 
-    img = cv2.flip(img, 0)
-    img_height = cv2.flip(img_height, 0)
+    # img = cv2.flip(img, 0)
+    # img_height = cv2.flip(img_height, 0)
 
     img = fill_gaps(img)
     img = create_frame(img, borders)
@@ -93,6 +93,16 @@ def analyze_image(
             center_z = img_height[round(obj[0][1])][round(obj[0][0])] / 1000  # Z
             angle = obj[2] * (np.pi / 180.)  # RAD
 
+            edge1 = np.int0((box[1][0] - box[0][0], box[1][1] - box[0][1]))
+            edge2 = np.int0((box[2][0] - box[1][0], box[2][1] - box[1][1]))
+            usedEdge = edge1
+            if cv.norm(edge2) > cv.norm(edge1):
+                usedEdge = edge2
+            reference = (1, 0)  # горизонтальный вектор, задающий горизонт
+            angle = 180.0 / math.pi * math.acos(
+                (reference[0] * usedEdge[0] + reference[1] * usedEdge[1]) / (cv.norm(reference) * cv.norm(usedEdge)))
+            angle = angle * (np.pi / 180.)  # RAD
+
             p = 2
             while center_z == 0:
                 center_z = img_height[int(cntr[p][0][1])][int(cntr[p][0][0])]
@@ -108,7 +118,7 @@ def analyze_image(
             brick_data.append(new_brick)
 
             print_if_debug2("Color", str(new_brick.color), "XYZ", str(new_brick.center_xy), str(new_brick.center_z))
-            print_if_debug2("Angle", str(new_brick.orientation))
+            print_if_debug2("Angle", str(obj[2]))
 
             '''if DEBUG_PIC:
                 print((int((-0.204-min_y)*1000), int((0.09-min_x)*1000)))
@@ -130,7 +140,7 @@ def analyze_image(
         new_z = (img_height[int(brick_pos[0] * -1000 - min_x), int(brick_pos[1] * -1000 - min_y)] / 1000)  # swap axes
         if new_z == 0:
             new_z = TABLE_Z
-        dif_z = new_z - old_z
+        dif_z = old_z - new_z
         print_if_debug2("new, old, dif z", str(new_z), str(old_z), str(dif_z))
     else:
         dif_z = 0
